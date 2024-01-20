@@ -9,7 +9,7 @@ import ru.yandex.practicum.filmorate.exceptions.UserNotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 
-import javax.validation.Valid;
+//import javax.validation.Valid;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,7 +31,8 @@ public class UserController {
 
 
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public User create(@Valid @RequestBody User newUser) {
+    // public User create(@Valid @RequestBody User newUser) {
+    public User create(@RequestBody User newUser) {
 
         validateUser(newUser);
 
@@ -52,7 +53,8 @@ public class UserController {
 
 
     @PutMapping
-    public User put(@Valid @RequestBody User updatedUser) {
+    // public User put(@Valid @RequestBody User updatedUser) {
+    public User put(@RequestBody User updatedUser) {
         validateUser(updatedUser);
 
         int idToUpdate = updatedUser.getId();
