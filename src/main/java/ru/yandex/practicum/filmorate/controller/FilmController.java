@@ -30,7 +30,6 @@ public class FilmController {
     }
 
 
-    //@PostMapping
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public Film create(@RequestBody Film film) {
 

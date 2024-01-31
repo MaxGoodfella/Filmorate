@@ -12,6 +12,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+
 public class UserControllerTest {
 
     private static UserController userController;
@@ -61,7 +62,7 @@ public class UserControllerTest {
         assertThrows(ValidationException.class, () -> userController.create(user));
     }
 
-//    //!!!!!
+    //!!!!!
 //    @Test
 //    public void testCreateUserWithInvalidEmail_shouldThrowValidationException() {
 //        User user = new User("это-неправильный?эмейл@", "login", LocalDate.now());
@@ -69,7 +70,7 @@ public class UserControllerTest {
 //
 //        assertThrows(ValidationException.class, () -> userController.create(user));
 //    }
-//    //!!!!
+    //!!!!
 
 
     @Test
