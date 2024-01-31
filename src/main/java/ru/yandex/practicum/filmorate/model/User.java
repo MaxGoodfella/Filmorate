@@ -12,12 +12,12 @@ public class User {
 
     private Integer id;
     private String name;
-//    @NonNull
-//    private String email;
-
     @NonNull
-    @Email
     private String email;
+
+//    @NonNull
+//    @Email
+//    private String email;
 
 //    @NonNull
 //    @Pattern(regexp="[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\."
