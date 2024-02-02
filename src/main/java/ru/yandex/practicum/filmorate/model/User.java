@@ -1,9 +1,8 @@
 package ru.yandex.practicum.filmorate.model;
 
 import lombok.Data;
-import lombok.NonNull;
 
-import javax.validation.constraints.Email;
+import javax.validation.constraints.*;
 import java.time.LocalDate;
 
 
@@ -11,30 +10,24 @@ import java.time.LocalDate;
 public class User {
 
     private Integer id;
+
     private String name;
-    @NonNull
+
+    @Email
+    @NotEmpty
     private String email;
 
-//    @NonNull
-//    @Email
-//    private String email;
-
-//    @NonNull
-//    @Pattern(regexp="[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\."
-//            +"[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@"
-//            +"(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?",
-//            message="{invalid.email}")
-//    String email;
-
-    @NonNull
+    @NotBlank
+    @Pattern(regexp="\\S*")
     private String login;
-    @NonNull
+
+    @NotNull
+    @PastOrPresent
     private LocalDate birthday;
 
 
-
-     public User(@Email @NonNull String email, @NonNull String login, @NonNull LocalDate birthday) {
-//    public User(@NonNull String email, @NonNull String login, @NonNull LocalDate birthday) {
+    public User(@Email @NotEmpty String email, @NotBlank @Pattern(regexp="\\S*") String login,
+                @NotNull @PastOrPresent LocalDate birthday) {
         this.email = email;
         this.login = login;
         this.birthday = birthday;

@@ -1,24 +1,20 @@
 package ru.yandex.practicum.filmorate.controller;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exceptions.FilmAlreadyExistsException;
-import ru.yandex.practicum.filmorate.exceptions.FilmNotFoundException;
-import ru.yandex.practicum.filmorate.exceptions.ValidationException;
+import ru.yandex.practicum.filmorate.exceptions.EntityAlreadyExistsException;
+import ru.yandex.practicum.filmorate.exceptions.EntityNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 
-import java.time.LocalDate;
-
+import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
 
 @RestController
+@Slf4j
 @RequestMapping("/films")
 public class FilmController {
-
-    private final Logger log = LoggerFactory.getLogger(FilmController.class);
 
     private final List<Film> films = new ArrayList<>();
 
@@ -31,9 +27,7 @@ public class FilmController {
 
 
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public Film create(@RequestBody Film film) {
-
-        validateFilm(film);
+    public Film create(@Valid @RequestBody Film film) {
 
         for (Film existingFilm : films) {
             if (existingFilm.getName().equals(film.getName()) &&
@@ -43,7 +37,7 @@ public class FilmController {
                 log.warn("Регистрация фильма не удалась. Фильм с названием {}, описанием {}, продолжительностью {} " +
                         "и датой выхода {} уже существует.",
                         film.getName(), film.getDescription(), film.getDuration(), film.getReleaseDate());
-                throw new FilmAlreadyExistsException("Фильм с названием " + film.getName() + " уже зарегистрирован.");
+                throw new EntityAlreadyExistsException(Film.class, "Фильм с названием " + film.getName() + " уже зарегистрирован.");
             }
         }
 
@@ -52,11 +46,11 @@ public class FilmController {
         films.add(film);
         log.info("Фильм успешно зарегистрирован. Название: {}", film.getName());
         return film;
+
     }
 
     @PutMapping
-    public Film put(@RequestBody Film updatedFilm) {
-        validateFilm(updatedFilm);
+    public Film put(@Valid @RequestBody Film updatedFilm) {
 
         int idToUpdate = updatedFilm.getId();
 
@@ -72,34 +66,13 @@ public class FilmController {
             }
         }
         log.warn("Фильм c id {} для обновления не найден.", idToUpdate);
-        throw new FilmNotFoundException("Фильм с id " + idToUpdate + " не найден.");
+        throw new EntityNotFoundException(Film.class, "Фильм с id " + idToUpdate + " не найден.");
+
     }
 
     @GetMapping
     public List<Film> findAll() {
         return films;
-    }
-
-
-    private void validateFilm(Film film) {
-        if (film.getName().isEmpty()) {
-            log.error("Название фильма не может быть пустым.");
-            throw new ValidationException("Название фильма не может быть пустым.");
-        }
-
-        if (film.getDescription().length() > 0 && film.getDescription().length() > 200) {
-            log.error("Максимальная длина описания фильма — 200 символов. Сейчас {}.", film.getDescription().length());
-            throw new ValidationException("Максимальная длина описания фильма — 200 символов.");
-        }
-
-        if (film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
-            log.error("Дата релиза не может быть раньше 28 декабря 1895 года. Сейчас {}.", film.getReleaseDate());
-            throw new ValidationException("Дата релиза не может быть раньше 28 декабря 1895 года.");
-        }
-
-        if (film.getDuration() <= 0) {
-            throw new ValidationException("Продолжительность фильма должна быть положительной.");
-        }
     }
 
 }

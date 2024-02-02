@@ -3,12 +3,16 @@ package ru.yandex.practicum.filmorate.tests;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.filmorate.controller.FilmController;
-import ru.yandex.practicum.filmorate.exceptions.FilmAlreadyExistsException;
-import ru.yandex.practicum.filmorate.exceptions.ValidationException;
+import ru.yandex.practicum.filmorate.exceptions.EntityAlreadyExistsException;
 import ru.yandex.practicum.filmorate.model.Film;
 
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -17,9 +21,14 @@ public class FilmControllerTest {
 
     private static FilmController filmController;
 
+    private Validator validator;
+
     @BeforeEach
     public void setUp() {
         filmController = new FilmController();
+
+        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+        validator = factory.getValidator();
     }
 
     @Test
@@ -35,28 +44,31 @@ public class FilmControllerTest {
         Film film2 = new Film("FilmName", "Description", LocalDate.now(), 1000);
 
         filmController.create(film1);
-        assertThrows(FilmAlreadyExistsException.class, () -> filmController.create(film2));
+        assertThrows(EntityAlreadyExistsException.class, () -> filmController.create(film2));
     }
 
     @Test
     public void testCreateFilmWithEmptyName_shouldThrowValidationException() {
         Film film = new Film("", "Description", LocalDate.now(), 1000);
 
-        assertThrows(ValidationException.class, () -> filmController.create(film));
+        Set<ConstraintViolation<Film>> violations = validator.validate(film);
+        assertFalse(violations.isEmpty(), "Отсутствует название фильма");
     }
 
     @Test
     public void testCreateFilmWithNegativeDuration_shouldThrowValidationException() {
         Film film = new Film("FilmName", "Description", LocalDate.now(), -1);
 
-        assertThrows(ValidationException.class, () -> filmController.create(film));
+        Set<ConstraintViolation<Film>> violations = validator.validate(film);
+        assertFalse(violations.isEmpty(), "Некорректная продолжительность фильма");
     }
 
     @Test
     public void testCreateFilmWithZeroDuration_shouldThrowValidationException() {
         Film film = new Film("FilmName", "Description", LocalDate.now(), 0);
 
-        assertThrows(ValidationException.class, () -> filmController.create(film));
+        Set<ConstraintViolation<Film>> violations = validator.validate(film);
+        assertFalse(violations.isEmpty(), "Некорректная продолжительность фильма");
     }
 
     @Test
@@ -67,7 +79,8 @@ public class FilmControllerTest {
 
         Film film = new Film("FilmName", invalidDescription, LocalDate.now(), 1000);
 
-        assertThrows(ValidationException.class, () -> filmController.create(film));
+        Set<ConstraintViolation<Film>> violations = validator.validate(film);
+        assertFalse(violations.isEmpty(), "Некорректное описание фильма");
     }
 
     @Test
@@ -76,7 +89,8 @@ public class FilmControllerTest {
 
         Film film = new Film("FilmName", "Description", releaseDateBefore18951228, 1000);
 
-        assertThrows(ValidationException.class, () -> filmController.create(film));
+        Set<ConstraintViolation<Film>> violations = validator.validate(film);
+        assertFalse(violations.isEmpty(), "Некорректная дата выхода фильма");
     }
 
     @Test
@@ -107,7 +121,8 @@ public class FilmControllerTest {
     public void testPutFilmWithInvalidName_shouldThrowValidationException() {
         Film film = new Film("", "Description", LocalDate.now(), 1000);
 
-        assertThrows(ValidationException.class, () -> filmController.put(film));
+        Set<ConstraintViolation<Film>> violations = validator.validate(film);
+        assertFalse(violations.isEmpty(), "Отсутствует названия фильма");
     }
 
     @Test
@@ -118,21 +133,25 @@ public class FilmControllerTest {
 
         Film film = new Film("FilmName", invalidDescription, LocalDate.now(), 1000);
 
-        assertThrows(ValidationException.class, () -> filmController.put(film));
+        Set<ConstraintViolation<Film>> violations = validator.validate(film);
+        assertFalse(violations.isEmpty(), "Некорректное описание фильма");
     }
 
     @Test
     public void testPutFilmWithInvalidReleaseDate_shouldThrowValidationException() {
-        Film film = new Film("FilmName", "Description", LocalDate.of(1895,12,27), 1000);
+        Film film = new Film("FilmName", "Description",
+                LocalDate.of(1895,12,27), 1000);
 
-        assertThrows(ValidationException.class, () -> filmController.put(film));
+        Set<ConstraintViolation<Film>> violations = validator.validate(film);
+        assertFalse(violations.isEmpty(), "Некорректная дата выхода фильма");
     }
 
     @Test
     public void testPutFilmWithInvalidDuration_shouldThrowValidationException() {
         Film film = new Film("FilmName", "Description", LocalDate.now(), 0);
 
-        assertThrows(ValidationException.class, () -> filmController.put(film));
+        Set<ConstraintViolation<Film>> violations = validator.validate(film);
+        assertFalse(violations.isEmpty(), "Некорректная продолжительность фильма");
     }
 
 

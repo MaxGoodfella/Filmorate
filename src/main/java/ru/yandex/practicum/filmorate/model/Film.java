@@ -1,8 +1,11 @@
 package ru.yandex.practicum.filmorate.model;
 
 import lombok.Data;
-import lombok.NonNull;
+import ru.yandex.practicum.filmorate.annotations.MinimumDate;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.Size;
 import java.time.LocalDate;
 
 
@@ -10,13 +13,26 @@ import java.time.LocalDate;
 public class Film {
 
     private Integer id;
-    @NonNull
+
+    @NotBlank
     private String name;
-    @NonNull
+
+    @Size(min = 1, max = 200)
     private String description;
-    @NonNull
+
+    @MinimumDate
     private LocalDate releaseDate;
-    @NonNull
+
+    @Positive
     private Integer duration;
+
+
+    public Film(@NotBlank String name, @Size(min = 1, max = 200) String description, @MinimumDate LocalDate releaseDate,
+                @Positive Integer duration) {
+        this.name = name;
+        this.description = description;
+        this.releaseDate = releaseDate;
+        this.duration = duration;
+    }
 
 }

@@ -3,12 +3,16 @@ package ru.yandex.practicum.filmorate.tests;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.filmorate.controller.UserController;
-import ru.yandex.practicum.filmorate.exceptions.UserAlreadyExistsException;
-import ru.yandex.practicum.filmorate.exceptions.ValidationException;
+import ru.yandex.practicum.filmorate.exceptions.EntityAlreadyExistsException;
 import ru.yandex.practicum.filmorate.model.User;
 
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -17,10 +21,15 @@ public class UserControllerTest {
 
     private static UserController userController;
 
+    private Validator validator;
+
 
     @BeforeEach
     public void setUp() {
         userController = new UserController();
+
+        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+        validator = factory.getValidator();
     }
 
 
@@ -41,7 +50,8 @@ public class UserControllerTest {
         user2.setName("name");
 
         userController.create(user1);
-        assertThrows(UserAlreadyExistsException.class, () -> userController.create(user2));
+
+        assertThrows(EntityAlreadyExistsException.class, () -> userController.create(user2));
     }
 
 
@@ -50,35 +60,35 @@ public class UserControllerTest {
         User user = new User("", "login", LocalDate.now());
         user.setName("name");
 
-        assertThrows(ValidationException.class, () -> userController.create(user));
+        Set<ConstraintViolation<User>> violations = validator.validate(user);
+        assertFalse(violations.isEmpty(), "Отсутствует электронная почта");
     }
-
 
     @Test
     public void testCreateUserWithoutAtSymbolInEmail_shouldThrowValidationException() {
         User user = new User("email.ru", "login", LocalDate.now());
         user.setName("name");
 
-        assertThrows(ValidationException.class, () -> userController.create(user));
+        Set<ConstraintViolation<User>> violations = validator.validate(user);
+        assertFalse(violations.isEmpty(), "Отсутствует символ @ в электронной почте");
     }
 
-    //!!!!!
-//    @Test
-//    public void testCreateUserWithInvalidEmail_shouldThrowValidationException() {
-//        User user = new User("это-неправильный?эмейл@", "login", LocalDate.now());
-//        user.setName("name");
-//
-//        assertThrows(ValidationException.class, () -> userController.create(user));
-//    }
-    //!!!!
+    @Test
+    public void testCreateUserWithInvalidEmail_shouldThrowValidationException() {
+        User user = new User("это-неправильный?эмейл@", "login", LocalDate.now());
+        user.setName("name");
 
+        Set<ConstraintViolation<User>> violations = validator.validate(user);
+        assertFalse(violations.isEmpty(), "Формат не соответствует формату электронной почты");
+    }
 
     @Test
     public void testCreateUserWithEmptyLogin_shouldThrowValidationException() {
         User user = new User("e@mail.ru", "", LocalDate.now());
         user.setName("name");
 
-        assertThrows(ValidationException.class, () -> userController.create(user));
+        Set<ConstraintViolation<User>> violations = validator.validate(user);
+        assertFalse(violations.isEmpty(), "Отсутствует логин");
     }
 
     @Test
@@ -86,7 +96,8 @@ public class UserControllerTest {
         User user = new User("e@mail.ru", "lo gin", LocalDate.now());
         user.setName("name");
 
-        assertThrows(ValidationException.class, () -> userController.create(user));
+        Set<ConstraintViolation<User>> violations = validator.validate(user);
+        assertFalse(violations.isEmpty(), "В логине присутствуют пробелы");
     }
 
     @Test
@@ -119,7 +130,8 @@ public class UserControllerTest {
         User user = new User("e@mail.ru", "login", LocalDate.of(2222, 12, 22));
         user.setName("name");
 
-        assertThrows(ValidationException.class, () -> userController.create(user));
+        Set<ConstraintViolation<User>> violations = validator.validate(user);
+        assertFalse(violations.isEmpty(), "Некорректная дата рождения");
     }
 
 
@@ -146,7 +158,8 @@ public class UserControllerTest {
         User user = new User("email.ru", "login", LocalDate.now());
         user.setName("name");
 
-        assertThrows(ValidationException.class, () -> userController.put(user));
+        Set<ConstraintViolation<User>> violations = validator.validate(user);
+        assertFalse(violations.isEmpty(), "Отсутствует символ @ в электронной почте");
     }
 
     @Test
@@ -154,7 +167,8 @@ public class UserControllerTest {
         User user = new User("", "login", LocalDate.now());
         user.setName("name");
 
-        assertThrows(ValidationException.class, () -> userController.put(user));
+        Set<ConstraintViolation<User>> violations = validator.validate(user);
+        assertFalse(violations.isEmpty(), "Некорректная электронная почта");
     }
 
     @Test
@@ -162,7 +176,8 @@ public class UserControllerTest {
         User user = new User("e@mail.ru", "lo gin", LocalDate.now());
         user.setName("name");
 
-        assertThrows(ValidationException.class, () -> userController.put(user));
+        Set<ConstraintViolation<User>> violations = validator.validate(user);
+        assertFalse(violations.isEmpty(), "В логине присутствуют пробелы");
     }
 
     @Test
@@ -170,7 +185,8 @@ public class UserControllerTest {
         User user = new User("e@mail.ru", "", LocalDate.now());
         user.setName("name");
 
-        assertThrows(ValidationException.class, () -> userController.put(user));
+        Set<ConstraintViolation<User>> violations = validator.validate(user);
+        assertFalse(violations.isEmpty(), "Отсутствует логин");
     }
 
     @Test
@@ -178,7 +194,8 @@ public class UserControllerTest {
         User user = new User("e@mail.ru", "login", LocalDate.of(2222, 12, 22));
         user.setName("name");
 
-        assertThrows(ValidationException.class, () -> userController.put(user));
+        Set<ConstraintViolation<User>> violations = validator.validate(user);
+        assertFalse(violations.isEmpty(), "Некорректная дата рождения");
     }
 
     @Test
