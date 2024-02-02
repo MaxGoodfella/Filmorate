@@ -32,14 +32,14 @@ public class FilmControllerTest {
     }
 
     @Test
-    public void testCreateFilmWithValidParameters_shouldNotThrowValidationException() {
+    public void testCreateFilmWithValidParameters() {
         Film film = new Film("FilmName", "Description", LocalDate.now(), 1000);
 
         assertDoesNotThrow(() -> filmController.create(film));
     }
 
     @Test
-    public void testCreateSameFilm_shouldThrowFilmAlreadyExistsException() {
+    public void testCreateSameFilm_shouldThrowEntityAlreadyExistsException() {
         Film film1 = new Film("FilmName", "Description", LocalDate.now(), 1000);
         Film film2 = new Film("FilmName", "Description", LocalDate.now(), 1000);
 

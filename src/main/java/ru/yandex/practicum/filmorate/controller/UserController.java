@@ -21,10 +21,6 @@ public class UserController {
     private int generatedID = 0;
 
 
-    private int generateID() {
-        return ++generatedID;
-    }
-
 
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public User create(@Valid @RequestBody User newUser) {
@@ -38,6 +34,13 @@ public class UserController {
 
                 throw new EntityAlreadyExistsException(User.class, "Пользователь с электронной почтой " +
                          newUser.getEmail() + " уже зарегистрирован.");
+            }
+            if (existingUser.getLogin().equals(newUser.getLogin())) {
+                log.warn("Регистрация пользователя не удалась. Пользователь с логином {} уже существует.",
+                        newUser.getLogin());
+
+                throw new EntityAlreadyExistsException(User.class, "Пользователь с логином " +
+                        newUser.getLogin() + " уже зарегистрирован.");
             }
         }
 
@@ -79,7 +82,11 @@ public class UserController {
     }
 
 
-    public void validateUser(User user) {
+    private int generateID() {
+        return ++generatedID;
+    }
+
+    private void validateUser(User user) {
         if (user.getName() == null || user.getName().isBlank()) {
             log.info("Имя отсутствует, в качестве имени будет использован логин {}", user.getLogin());
             user.setName(user.getLogin());

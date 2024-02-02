@@ -18,12 +18,7 @@ public class FilmController {
 
     private final List<Film> films = new ArrayList<>();
 
-    protected int generatedID = 0;
-
-
-    private int generateID() {
-        return ++generatedID;
-    }
+    private int generatedID = 0;
 
 
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
@@ -32,7 +27,7 @@ public class FilmController {
         for (Film existingFilm : films) {
             if (existingFilm.getName().equals(film.getName()) &&
                     existingFilm.getDescription().equals(film.getDescription()) &&
-                    existingFilm.getDuration().equals(film.getDuration()) &&
+                    existingFilm.getDuration() == film.getDuration() &&
                     existingFilm.getReleaseDate().equals(film.getReleaseDate())) {
                 log.warn("Регистрация фильма не удалась. Фильм с названием {}, описанием {}, продолжительностью {} " +
                         "и датой выхода {} уже существует.",
@@ -73,6 +68,11 @@ public class FilmController {
     @GetMapping
     public List<Film> findAll() {
         return films;
+    }
+
+
+    private int generateID() {
+        return ++generatedID;
     }
 
 }

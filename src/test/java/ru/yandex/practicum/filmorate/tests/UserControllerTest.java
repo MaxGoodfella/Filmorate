@@ -34,7 +34,7 @@ public class UserControllerTest {
 
 
     @Test
-    public void testCreateUserWithValidParameters_shouldNotThrowValidationException() {
+    public void testCreateUserWithValidParameters() {
         User user = new User("e@mail.ru", "login", LocalDate.now());
         user.setName("name");
 
@@ -43,7 +43,7 @@ public class UserControllerTest {
 
 
     @Test
-    public void testCreateUserWithSameEmail_shouldThrowUserAlreadyExistsException() {
+    public void testCreateUserWithSameEmail_shouldThrowEntityAlreadyExistsException() {
         User user1 = new User("e@mail.ru", "login", LocalDate.now());
         User user2 = new User("e@mail.ru", "login", LocalDate.now());
         user1.setName("name");
@@ -80,6 +80,18 @@ public class UserControllerTest {
 
         Set<ConstraintViolation<User>> violations = validator.validate(user);
         assertFalse(violations.isEmpty(), "Формат не соответствует формату электронной почты");
+    }
+
+    @Test
+    public void testCreateUserWithSameLogin_shouldThrowEntityAlreadyExistsException() {
+        User user1 = new User("e@mail.ru", "login", LocalDate.now());
+        User user2 = new User("email@mail.ru", "login", LocalDate.of(1999, 12, 4));
+        user1.setName("name1");
+        user2.setName("name2");
+
+        userController.create(user1);
+
+        assertThrows(EntityAlreadyExistsException.class, () -> userController.create(user2));
     }
 
     @Test
