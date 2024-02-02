@@ -18,7 +18,7 @@ public class User {
     private String email;
 
     @NotBlank
-    @Pattern(regexp="\\S*")
+    @Pattern(regexp = "\\S*")
     private String login;
 
     @NotNull
@@ -26,7 +26,7 @@ public class User {
     private LocalDate birthday;
 
 
-    public User(@Email @NotEmpty String email, @NotBlank @Pattern(regexp="\\S*") String login,
+    public User(@Email @NotEmpty String email, @NotBlank @Pattern(regexp = "\\S*") String login,
                 @NotNull @PastOrPresent LocalDate birthday) {
         this.email = email;
         this.login = login;
