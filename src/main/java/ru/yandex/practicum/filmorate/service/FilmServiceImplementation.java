@@ -21,7 +21,6 @@ public class FilmServiceImplementation implements FilmService {
 
     private FilmStorage filmStorage;
     private UserStorage userStorage;
-    
 
     @Override
     public Film create(Film film) {
