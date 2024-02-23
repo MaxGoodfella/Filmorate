@@ -29,8 +29,7 @@ public class User {
     private LocalDate birthday;
 
     @Singular
-    private final Set<Long> friends = new HashSet<>();
-
+    private final Set<Integer> friends = new HashSet<>();
 
     public User(@Email @NotEmpty String email, @NotBlank @Pattern(regexp = "\\S*") String login,
                 @NotNull @PastOrPresent LocalDate birthday) {

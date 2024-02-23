@@ -7,7 +7,6 @@ import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.util.List;
-import java.util.Map;
 
 @Slf4j
 @Service
@@ -29,7 +28,7 @@ public class UserServiceImplementation implements UserService {
     }
 
     @Override
-    public Map<Integer, User> findAll() {
+    public List<User> findAll() {
         return userStorage.findAll();
     }
 

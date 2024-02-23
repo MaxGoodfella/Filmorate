@@ -33,7 +33,7 @@ public class Film {
     private int duration;
 
     @Singular
-    private final Set<Long> likes = new HashSet<>();
+    private final Set<Integer> likes = new HashSet<>();
 
 
     public Film(@NotBlank String name, @NotNull @Size(min = 1, max = 200) String description, @NotNull @MinimumDate LocalDate releaseDate,

@@ -33,8 +33,8 @@ public class FilmController {
     }
 
     @GetMapping
-    public Object[] findAll() {
-        return filmService.findAll().values().toArray();
+    public List<Film> findAll() {
+        return filmService.findAll();
     }
 
     @PutMapping("/{id}/like/{userId}")

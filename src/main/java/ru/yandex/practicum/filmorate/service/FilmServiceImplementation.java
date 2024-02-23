@@ -3,7 +3,6 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exceptions.EntityNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
@@ -11,7 +10,6 @@ import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 @Slf4j
@@ -33,29 +31,19 @@ public class FilmServiceImplementation implements FilmService {
     }
 
     @Override
-    public Map<Integer, Film> findAll() {
+    public List<Film> findAll() {
         return filmStorage.findAll();
     }
 
     @Override
     public Film addLike(Integer filmId, Integer userId) {
-        User user = userStorage.findUserByID(userId);
-        if (user == null) {
-            log.warn("Пользователь с ID {} не найден.", userId);
-            throw new EntityNotFoundException(User.class, "Пользователь с ID " + userId + " не найден.");
-        }
-
+        userStorage.findUserByID(userId);
         return filmStorage.addLike(filmId, userId);
     }
 
     @Override
     public Film removeLike(Integer filmId, Integer userId) {
-        User user = userStorage.findUserByID(userId);
-        if (user == null) {
-            log.warn("Пользователь с ID {} не найден.", userId);
-            throw new EntityNotFoundException(User.class, "Пользователь с ID " + userId + " не найден.");
-        }
-
+        userStorage.findUserByID(userId);
         return filmStorage.removeLike(filmId, userId);
     }
 
@@ -71,16 +59,12 @@ public class FilmServiceImplementation implements FilmService {
 
     @Override
     public Set<User> getAllLikes(Integer filmID) {
-        Set<Long> fansIds = filmStorage.getAllLikes(filmID);
+        Set<Integer> fansIds = filmStorage.getAllLikes(filmID);
         Set<User> filmFans = new HashSet<>();
-        for (Long userId : fansIds) {
-            User user = userStorage.findUserByID(userId.intValue());
-            if (user != null) {
-                filmFans.add(user);
-            } else {
-                log.warn("Пользователь с ID {} не найден.", userId.intValue());
-                throw new EntityNotFoundException(User.class, "Пользователь с ID " + userId.intValue() + " не найден.");
-            }
+
+        for (Integer userId : fansIds) {
+            User user = userStorage.findUserByID(userId);
+            filmFans.add(user);
         }
         return filmFans;
     }

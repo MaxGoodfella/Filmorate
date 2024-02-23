@@ -13,7 +13,6 @@ import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -208,7 +207,6 @@ public class InMemoryUserStorageTest {
 
     @Test
     public void testFindAll() {
-        Map<Integer, User> users = inMemoryUserStorage.findAll();
 
         User user1 = new User("e@mail.ru", "login1", LocalDate.now());
         User user2 = new User("e@mail.com", "login2", LocalDate.now());
@@ -217,9 +215,11 @@ public class InMemoryUserStorageTest {
         inMemoryUserStorage.create(user1);
         inMemoryUserStorage.create(user2);
 
-        assertEquals(user1, users.get(user1.getId()), "Первый элемент не совпадает");
-        assertEquals(user2, users.get(user2.getId()), "Второй элемент не совпадает");
-        assertEquals(2,users.size(), "Количество элементов не совпадает");
+        List<User> users = inMemoryUserStorage.findAll();
+
+        assertEquals(2, users.size(), "Количество элементов не совпадает");
+        assertEquals(user1, users.get(0), "Первый элемент не совпадает");
+        assertEquals(user2, users.get(1), "Второй элемент не совпадает");
 
 
         User updatedUser1 = new User("e@mail.ru", "updated_login1", LocalDate.of(2010, 10, 10));
@@ -228,12 +228,15 @@ public class InMemoryUserStorageTest {
         updatedUser2.setName("UpdatedUser2");
         updatedUser1.setId(user1.getId());
         updatedUser2.setId(user2.getId());
-        User resultUser1 = inMemoryUserStorage.put(updatedUser1);
-        User resultUser2 = inMemoryUserStorage.put(updatedUser2);
+        inMemoryUserStorage.put(updatedUser1);
+        inMemoryUserStorage.put(updatedUser2);
 
-        assertEquals(resultUser1, users.get(resultUser1.getId()), "Первый элемент не совпадает после обновления");
-        assertEquals(resultUser2, users.get(resultUser2.getId()), "Второй элемент не совпадает после обновления");
-        assertEquals(2,users.size(), "Количество элементов не совпадает после обновления");
+        List<User> updatedUsers = inMemoryUserStorage.findAll();
+
+        assertEquals(2, updatedUsers.size(), "Количество элементов не совпадает после обновления");
+        assertEquals(updatedUser1, updatedUsers.get(0), "Первый элемент не совпадает после обновления");
+        assertEquals(updatedUser2, updatedUsers.get(1), "Второй элемент не совпадает после обновления");
+
     }
 
 

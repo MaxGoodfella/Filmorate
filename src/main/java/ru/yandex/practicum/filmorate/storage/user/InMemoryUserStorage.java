@@ -39,6 +39,7 @@ public class InMemoryUserStorage implements UserStorage {
         users.put(newUser.getId(), newUser);
 
         log.info("Пользователь успешно зарегистрирован. Email: {}", newUser.getEmail());
+
         return newUser;
     }
 
@@ -75,38 +76,30 @@ public class InMemoryUserStorage implements UserStorage {
         userToUpdate.setLogin(updatedUser.getLogin());
 
         log.info("Информация о пользователе с id {} успешно обновлена.", idToUpdate);
+
         return userToUpdate;
 
     }
 
     @Override
-    public Map<Integer, User> findAll() {
-        return users;
+    public List<User> findAll() {
+        return List.copyOf(users.values());
     }
 
     @Override
     public User addFriend(Integer userId, Integer friendId) {
+
         User user = findUserByID(userId);
         User usersFriend = findUserByID(friendId);
 
-        if (user == null) {
-            log.warn("Пользователь с ID {} не найден.", userId);
-            throw new EntityNotFoundException(User.class, "Пользователь с ID " + userId + " не найден.");
-        }
+        Set<Integer> listOfFriends1 = user.getFriends();
+        Set<Integer> listOfFriends2 = usersFriend.getFriends();
+        int idToAdd1 = usersFriend.getId();
+        int idToAdd2 = user.getId();
 
-        if (usersFriend == null) {
-            log.warn("Пользователь с ID {} не найден.", friendId);
-            throw new EntityNotFoundException(User.class, "Пользователь с ID " + friendId + " не найден.");
-        }
-
-        Set<Long> listOfFriends1 = user.getFriends();
-        Set<Long> listOfFriends2 = usersFriend.getFriends();
-        long idToAdd1 = usersFriend.getId();
-        long idToAdd2 = user.getId();
-
-        for (Long friendID : listOfFriends1) {
+        for (Integer friendID : listOfFriends1) {
             if (friendID.equals(idToAdd1)) {
-                User existingFriend = findUserByID(friendID.intValue());
+                User existingFriend = findUserByID(friendID);
                 if (!existingFriend.equals(usersFriend)) {
                     existingFriend.setName(usersFriend.getName());
                     existingFriend.setEmail(usersFriend.getEmail());
@@ -128,6 +121,7 @@ public class InMemoryUserStorage implements UserStorage {
                 user.getEmail(), usersFriend.getEmail());
 
         return usersFriend;
+
     }
 
     @Override
@@ -136,20 +130,10 @@ public class InMemoryUserStorage implements UserStorage {
         User user = findUserByID(userId);
         User usersExFriend = findUserByID(friendId);
 
-        if (user == null) {
-            log.warn("Пользователь с ID {} не найден.", userId);
-            throw new EntityNotFoundException(User.class, "Пользователь с ID " + userId + " не найден.");
-        }
-
-        if (usersExFriend == null) {
-            log.warn("Пользователь с ID {} не найден.", friendId);
-            throw new EntityNotFoundException(User.class, "Пользователь с ID " + friendId + " не найден.");
-        }
-
-        Set<Long> listOfFriends1 = user.getFriends();
-        Set<Long> listOfFriends2 = usersExFriend.getFriends();
-        long idToRemove1 = usersExFriend.getId();
-        long idToRemove2 = user.getId();
+        Set<Integer> listOfFriends1 = user.getFriends();
+        Set<Integer> listOfFriends2 = usersExFriend.getFriends();
+        int idToRemove1 = usersExFriend.getId();
+        int idToRemove2 = user.getId();
 
         if (!listOfFriends1.contains(idToRemove1)) {
             log.warn("Пользователь электронной почтой {} не найден в списке друзей пользователя с почтой {}.",
@@ -173,59 +157,37 @@ public class InMemoryUserStorage implements UserStorage {
 
     @Override
     public List<User> getAllFriends(Integer userID) {
-
         User user = findUserByID(userID);
-
-        if (user != null) {
-            Set<Long> friendIds = user.getFriends();
-            List<User> userFriends = new ArrayList<>();
-
-            for (Long friendId : friendIds) {
-                for (User friend : users.values()) {
-                    if (friend.getId().equals(friendId.intValue())) {
-                        userFriends.add(friend);
-                        break;
-                    }
-                }
-            }
-
-            return userFriends;
-        } else {
-            log.warn("Пользователь с id {} не найден.", userID);
-            throw new EntityNotFoundException(User.class, "Пользователь с ID " + userID + " не найден.");
+        Set<Integer> friendIds = user.getFriends();
+        List<User> userFriends = new ArrayList<>();
+        for (Integer friendId : friendIds) {
+            User friend = findUserByID(friendId);
+            // if (friend != null) {
+                userFriends.add(friend);
+            // }
         }
-
+        return userFriends;
     }
 
     @Override
     public List<User> getMutualFriends(Integer user1ID, Integer user2ID) {
-
         User user1 = findUserByID(user1ID);
         User user2 = findUserByID(user2ID);
 
-        if (user1 != null && user2 != null) {
+        List<User> user1Friends = getAllFriends(user1ID);
+        List<User> user2Friends = getAllFriends(user2ID);
 
-            List<User> user1Friends = getAllFriends(user1ID);
-            List<User> user2Friends = getAllFriends(user2ID);
+        user1Friends.retainAll(user2Friends);
 
-            user1Friends.retainAll(user2Friends);
-
-            return user1Friends;
-
-        } else {
-            log.warn("Один из пользователей с id {} или {} не найден.", user1ID, user2ID);
-            throw new EntityNotFoundException(User.class, "Один из пользователей с ID " + user1ID + " или "
-                    + user2ID + " не найден.");
-        }
-
+        return user1Friends;
     }
 
     @Override
     public User findUserByID(Integer userID) {
-        Optional<User> userOptional = users.values().stream().filter(user -> user.getId().equals(userID)).findFirst();
+        User user = users.get(userID);
 
-        return userOptional.orElseThrow(() ->
-                new EntityNotFoundException(User.class, "Пользователь с ID " + userID + " не найден."));
+        return Optional.ofNullable(user).orElseThrow(() -> new EntityNotFoundException(User.class,
+                        "Пользователь с ID " + userID + " не найден."));
     }
 
 

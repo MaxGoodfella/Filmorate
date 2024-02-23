@@ -160,15 +160,16 @@ public class InMemoryFilmStorageTest {
 
     @Test
     public void testFindAll() {
-        Map<Integer, Film> films = inMemoryFilmStorage.findAll();
 
         Film film1 = new Film("FilmName1", "Description1", LocalDate.now(), 1000);
         Film film2 = new Film("FilmName2", "Description2", LocalDate.now(), 2000);
         inMemoryFilmStorage.create(film1);
         inMemoryFilmStorage.create(film2);
 
-        assertEquals(film1, films.get(film1.getId()), "Первый элемент не совпадает");
-        assertEquals(film2, films.get(film2.getId()), "Второй элемент не совпадает");
+        List<Film> films = inMemoryFilmStorage.findAll();
+
+        assertEquals(film1, films.get(0), "Первый элемент не совпадает");
+        assertEquals(film2, films.get(1), "Второй элемент не совпадает");
         assertEquals(2,films.size(), "Количество элементов не совпадает");
 
 
@@ -179,9 +180,12 @@ public class InMemoryFilmStorageTest {
         Film resultFilm1 = inMemoryFilmStorage.put(updatedFilm1);
         Film resultFilm2 = inMemoryFilmStorage.put(updatedFilm2);
 
-        assertEquals(resultFilm1, films.get(resultFilm1.getId()), "Первый элемент не совпадает после обновления");
-        assertEquals(resultFilm2, films.get(resultFilm2.getId()), "Второй элемент не совпадает после обновления");
-        assertEquals(2,films.size(), "Количество элементов не совпадает после обновления");
+        List<Film> updatedFilms = inMemoryFilmStorage.findAll();
+
+        assertEquals(resultFilm1, updatedFilms.get(0), "Первый элемент не совпадает после обновления");
+        assertEquals(resultFilm2, updatedFilms.get(1), "Второй элемент не совпадает после обновления");
+        assertEquals(2,updatedFilms.size(), "Количество элементов не совпадает после обновления");
+
     }
 
 

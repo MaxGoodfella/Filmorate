@@ -44,37 +44,32 @@ public class InMemoryFilmStorage implements FilmStorage {
     public Film put(Film updatedFilm) {
         int idToUpdate = updatedFilm.getId();
 
-        for (Film film : films.values()) {
-            if (film.getId() == idToUpdate) {
-                film.setDescription(updatedFilm.getDescription());
-                film.setName(updatedFilm.getName());
-                film.setReleaseDate(updatedFilm.getReleaseDate());
-                film.setDuration(updatedFilm.getDuration());
+        if (films.containsKey(idToUpdate)) {
+            Film film = films.get(idToUpdate);
+            film.setDescription(updatedFilm.getDescription());
+            film.setName(updatedFilm.getName());
+            film.setReleaseDate(updatedFilm.getReleaseDate());
+            film.setDuration(updatedFilm.getDuration());
 
-                log.info("Фильм c id {} успешно обновлен. Название: {}", idToUpdate, updatedFilm.getName());
-                return film;
-            }
+            log.info("Фильм c id {} успешно обновлен. Название: {}", idToUpdate, updatedFilm.getName());
+            return film;
         }
+
         log.warn("Фильм c id {} для обновления не найден.", idToUpdate);
         throw new EntityNotFoundException(Film.class, "Фильм с id " + idToUpdate + " не найден.");
     }
 
     @Override
-    public Map<Integer, Film> findAll() {
-        return films;
+    public List<Film> findAll() {
+        return List.copyOf(films.values());
     }
 
     @Override
     public Film addLike(Integer filmId, Integer userId) {
         Film film = findFilmByID(filmId);
 
-        if (film == null) {
-            log.warn("Фильм с ID {} не найден.", filmId);
-            throw new EntityNotFoundException(Film.class, "Фильм с ID " + filmId + " не найден.");
-        }
-
-        Set<Long> listOfFans = film.getLikes();
-        long idToAdd = userId;
+        Set<Integer> listOfFans = film.getLikes();
+        int idToAdd = userId;
 
         if (listOfFans.contains(idToAdd)) {
             log.warn("Пользователь с ID {} уже добавил фильм с названием {} в понравившиеся.",
@@ -93,13 +88,9 @@ public class InMemoryFilmStorage implements FilmStorage {
     @Override
     public Film removeLike(Integer filmId, Integer userId) {
         Film film = findFilmByID(filmId);
-        if (film == null) {
-            log.warn("Фильм с ID {} не найден.", filmId);
-            throw new EntityNotFoundException(Film.class, "Фильм с ID " + filmId + " не найден.");
-        }
 
-        Set<Long> listOfFans = film.getLikes();
-        long idToRemove = userId;
+        Set<Integer> listOfFans = film.getLikes();
+        int idToRemove = userId;
 
         if (!listOfFans.contains(idToRemove)) {
             log.warn("Фильм с названием {} не найден в списке понравившихся фильмов пользователя с ID {}.",
@@ -131,23 +122,16 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public Film findFilmByID(Integer filmID) {
-        Optional<Film> filmOptional = films.values().stream()
-                .filter(film -> film.getId().equals(filmID))
-                .findFirst();
+        Film film = films.get(filmID);
 
-        return filmOptional.orElseThrow(() ->
-                new EntityNotFoundException(Film.class, "Фильм с ID " + filmID + " не найден."));
+        return Optional.ofNullable(film).orElseThrow(() -> new EntityNotFoundException(User.class,
+                        "Пользователь с ID " + filmID + " не найден."));
     }
 
     @Override
-    public Set<Long> getAllLikes(Integer filmID) {
+    public Set<Integer> getAllLikes(Integer filmID) {
         Film film = findFilmByID(filmID);
-        if (film != null) {
-            return film.getLikes();
-        } else {
-            log.warn("Фильм с id {} не найден.", filmID);
-            throw new EntityNotFoundException(Film.class, "Фильм с ID " + filmID + " не найден.");
-        }
+        return film.getLikes();
     }
 
 

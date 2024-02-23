@@ -3,7 +3,6 @@ package ru.yandex.practicum.filmorate.service;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.List;
-import java.util.Map;
 
 public interface UserService {
 
@@ -11,7 +10,7 @@ public interface UserService {
 
     User put(User updatedUser);
 
-    Map<Integer, User> findAll();
+    List<User> findAll();
 
     User addFriend(Integer userId, Integer friendId);
 
