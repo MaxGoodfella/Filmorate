@@ -26,7 +26,7 @@ public class CustomExceptionHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleTopLikedListLength(ConstraintViolationException e){
+    public ErrorResponse handleTopLikedListLength(ConstraintViolationException e) {
         log.debug("Получен статус 400 Bad Request {}", e.getMessage(), e);
         return new ErrorResponse(
                 e.getMessage()
