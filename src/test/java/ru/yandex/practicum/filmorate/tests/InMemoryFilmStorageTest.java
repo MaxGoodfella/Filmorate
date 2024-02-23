@@ -6,6 +6,7 @@ import ru.yandex.practicum.filmorate.exceptions.EntityAlreadyExistsException;
 import ru.yandex.practicum.filmorate.exceptions.EntityNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.FilmServiceImplementation;
 import ru.yandex.practicum.filmorate.storage.film.InMemoryFilmStorage;
 import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
 
@@ -28,7 +29,7 @@ public class InMemoryFilmStorageTest {
     @BeforeEach
     public void setUp() {
         inMemoryUserStorage = new InMemoryUserStorage();
-        inMemoryFilmStorage = new InMemoryFilmStorage(inMemoryUserStorage);
+        inMemoryFilmStorage = new InMemoryFilmStorage();
 
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
         validator = factory.getValidator();
@@ -159,15 +160,15 @@ public class InMemoryFilmStorageTest {
 
     @Test
     public void testFindAll() {
-        List<Film> films = inMemoryFilmStorage.findAll();
+        Map<Integer, Film> films = inMemoryFilmStorage.findAll();
 
         Film film1 = new Film("FilmName1", "Description1", LocalDate.now(), 1000);
         Film film2 = new Film("FilmName2", "Description2", LocalDate.now(), 2000);
         inMemoryFilmStorage.create(film1);
         inMemoryFilmStorage.create(film2);
 
-        assertEquals(film1, films.get(0), "Первый элемент не совпадает");
-        assertEquals(film2, films.get(1), "Второй элемент не совпадает");
+        assertEquals(film1, films.get(film1.getId()), "Первый элемент не совпадает");
+        assertEquals(film2, films.get(film2.getId()), "Второй элемент не совпадает");
         assertEquals(2,films.size(), "Количество элементов не совпадает");
 
 
@@ -178,8 +179,8 @@ public class InMemoryFilmStorageTest {
         Film resultFilm1 = inMemoryFilmStorage.put(updatedFilm1);
         Film resultFilm2 = inMemoryFilmStorage.put(updatedFilm2);
 
-        assertEquals(resultFilm1, films.get(0), "Первый элемент не совпадает после обновления");
-        assertEquals(resultFilm2, films.get(1), "Второй элемент не совпадает после обновления");
+        assertEquals(resultFilm1, films.get(resultFilm1.getId()), "Первый элемент не совпадает после обновления");
+        assertEquals(resultFilm2, films.get(resultFilm2.getId()), "Второй элемент не совпадает после обновления");
         assertEquals(2,films.size(), "Количество элементов не совпадает после обновления");
     }
 
@@ -195,7 +196,11 @@ public class InMemoryFilmStorageTest {
 
         inMemoryFilmStorage.addLike(createdFilm1.getId(), createdUser1.getId());
 
-        Set<User> film1Fans = inMemoryFilmStorage.getAllLikes(createdFilm1.getId());
+
+        FilmServiceImplementation filmServiceImplementation =
+                new FilmServiceImplementation(inMemoryFilmStorage, inMemoryUserStorage);
+
+        Set<User> film1Fans = filmServiceImplementation.getAllLikes(createdFilm1.getId());
 
         assertTrue(film1Fans.contains(createdUser1), "Пользователь поставил лайк фильму");
     }
@@ -211,8 +216,8 @@ public class InMemoryFilmStorageTest {
 
         inMemoryFilmStorage.addLike(createdFilm1.getId(), createdUser1.getId());
 
-        assertThrows(EntityAlreadyExistsException.class, () -> inMemoryFilmStorage.addLike(createdFilm1.getId(), createdUser1.getId()),
-                "Пользователь уже поставил лайк фильму");
+        assertThrows(EntityAlreadyExistsException.class, () -> inMemoryFilmStorage.addLike(createdFilm1.getId(),
+                        createdUser1.getId()), "Пользователь уже поставил лайк фильму");
     }
 
 
@@ -234,7 +239,11 @@ public class InMemoryFilmStorageTest {
 
         inMemoryFilmStorage.removeLike(createdFilm1.getId(), createdUser1.getId());
 
-        Set<User> film1Fans = inMemoryFilmStorage.getAllLikes(createdFilm1.getId());
+
+        FilmServiceImplementation filmServiceImplementation =
+                new FilmServiceImplementation(inMemoryFilmStorage, inMemoryUserStorage);
+
+        Set<User> film1Fans = filmServiceImplementation.getAllLikes(createdFilm1.getId());
 
 
         assertFalse(film1Fans.contains(createdUser1), "Пользователь 1 удалил лайк фильму");
@@ -257,8 +266,8 @@ public class InMemoryFilmStorageTest {
         inMemoryFilmStorage.addLike(createdFilm1.getId(), createdUser1.getId());
 
 
-        assertThrows(EntityNotFoundException.class, () -> inMemoryFilmStorage.removeLike(createdFilm1.getId(), createdUser2.getId()),
-                "Пользователь 2 не ставил лайк фильму");
+        assertThrows(EntityNotFoundException.class, () -> inMemoryFilmStorage.removeLike(createdFilm1.getId(),
+                        createdUser2.getId()), "Пользователь 2 не ставил лайк фильму");
     }
 
 
@@ -290,7 +299,7 @@ public class InMemoryFilmStorageTest {
             }
         }
 
-        List<Film> topFilms = inMemoryFilmStorage.getTop10ByLikes(10);
+        List<Film> topFilms = inMemoryFilmStorage.getTopByLikes(10);
 
 
         assertEquals(10, topFilms.size());

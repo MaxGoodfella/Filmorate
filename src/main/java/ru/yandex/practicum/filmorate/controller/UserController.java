@@ -30,8 +30,8 @@ public class UserController {
     }
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<User> findAll() {
-        return userService.findAll();
+    public Object[] findAll() {
+        return userService.findAll().values().toArray();
     }
 
     @PutMapping("/{id}/friends/{friendId}")

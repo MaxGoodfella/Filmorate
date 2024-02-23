@@ -13,6 +13,7 @@ import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -41,7 +42,6 @@ public class InMemoryUserStorageTest {
         assertDoesNotThrow(() -> inMemoryUserStorage.create(user));
     }
 
-
     @Test
     public void testCreateUserWithSameEmail_shouldThrowEntityAlreadyExistsException() {
         User user1 = new User("e@mail.ru", "login", LocalDate.now());
@@ -53,7 +53,6 @@ public class InMemoryUserStorageTest {
 
         assertThrows(EntityAlreadyExistsException.class, () -> inMemoryUserStorage.create(user2));
     }
-
 
     @Test
     public void testCreateUserWithEmptyEmail_shouldThrowValidationException() {
@@ -121,23 +120,6 @@ public class InMemoryUserStorageTest {
     }
 
     @Test
-    public void testCreateUserWithEmptyName() {
-        User user = new User("e@mail.ru", "login", LocalDate.now());
-        user.setName("");
-
-        inMemoryUserStorage.create(user);
-        assertEquals("login", user.getName(), "Имя отсутствует, логин выступает в качестве имени");
-    }
-
-    @Test
-    public void testCreateUserWithNoName() {
-        User user = new User("e@mail.ru", "login", LocalDate.now());
-
-        inMemoryUserStorage.create(user);
-        assertEquals("login", user.getName(), "Имя отсутствует, логин выступает в качестве имени");
-    }
-
-    @Test
     public void testCreateUserInvalidBirthday_shouldThrowValidationException() {
         User user = new User("e@mail.ru", "login", LocalDate.of(2222, 12, 22));
         user.setName("name");
@@ -163,6 +145,19 @@ public class InMemoryUserStorageTest {
         assertEquals("new_login", resultUser.getLogin(), "Логин не совпадает");
         assertEquals("New User", resultUser.getName(), "Имя не совпадает");
         assertEquals(LocalDate.of(1995, 5, 5), resultUser.getBirthday(), "Дата рождения не совпадает");
+    }
+
+    @Test
+    public void testPutUpdateUnknownUser_shouldThrowEntityNotFoundException() {
+        User existingUser = new User("e1@mail.ru", "login", LocalDate.of(1991, 1, 1));
+        existingUser.setName("User");
+        inMemoryUserStorage.create(existingUser);
+
+        User updatedUser = new User("e2@mail.ru", "new_login", LocalDate.of(1995, 5, 5));
+        updatedUser.setName("New User");
+        updatedUser.setId(2);
+
+        assertThrows(EntityNotFoundException.class, () -> inMemoryUserStorage.put(updatedUser));
     }
 
     @Test
@@ -210,22 +205,10 @@ public class InMemoryUserStorageTest {
         assertFalse(violations.isEmpty(), "Некорректная дата рождения");
     }
 
-    @Test
-    public void testPutUserWithNoName() {
-        User existingUser = new User("e@mail.ru", "login", LocalDate.of(1991, 1, 1));
-        inMemoryUserStorage.create(existingUser);
-
-        User updatedUser = new User("e@mail.ru", "new_login", LocalDate.of(1995, 5, 5));
-        updatedUser.setId(existingUser.getId());
-        User resultUser = inMemoryUserStorage.put(updatedUser);
-
-        assertEquals("new_login", resultUser.getName(), "Имя отсутствует, логин выступает в качестве имени");
-    }
-
 
     @Test
     public void testFindAll() {
-        List<User> users = inMemoryUserStorage.findAll();
+        Map<Integer, User> users = inMemoryUserStorage.findAll();
 
         User user1 = new User("e@mail.ru", "login1", LocalDate.now());
         User user2 = new User("e@mail.com", "login2", LocalDate.now());
@@ -234,8 +217,8 @@ public class InMemoryUserStorageTest {
         inMemoryUserStorage.create(user1);
         inMemoryUserStorage.create(user2);
 
-        assertEquals(user1, users.get(0), "Первый элемент не совпадает");
-        assertEquals(user2, users.get(1), "Второй элемент не совпадает");
+        assertEquals(user1, users.get(user1.getId()), "Первый элемент не совпадает");
+        assertEquals(user2, users.get(user2.getId()), "Второй элемент не совпадает");
         assertEquals(2,users.size(), "Количество элементов не совпадает");
 
 
@@ -248,8 +231,8 @@ public class InMemoryUserStorageTest {
         User resultUser1 = inMemoryUserStorage.put(updatedUser1);
         User resultUser2 = inMemoryUserStorage.put(updatedUser2);
 
-        assertEquals(resultUser1, users.get(0), "Первый элемент не совпадает после обновления");
-        assertEquals(resultUser2, users.get(1), "Второй элемент не совпадает после обновления");
+        assertEquals(resultUser1, users.get(resultUser1.getId()), "Первый элемент не совпадает после обновления");
+        assertEquals(resultUser2, users.get(resultUser2.getId()), "Второй элемент не совпадает после обновления");
         assertEquals(2,users.size(), "Количество элементов не совпадает после обновления");
     }
 
@@ -300,8 +283,6 @@ public class InMemoryUserStorageTest {
         assertFalse(user2Friends.contains(createdUser2),
                 "Пользователь 1 не находится в списке друзей пользователя 2");
     }
-
-
 
     @Test
     public void testRemoveFriend_shouldThrowEntityNotFoundException() {
@@ -366,7 +347,6 @@ public class InMemoryUserStorageTest {
                 "Пользователь 1 находится в списке друзей пользователя 3");
     }
 
-
     @Test
     public void testGetAllFriends_shouldThrowEntityNotFoundException() {
         User user1 = new User("e1@mail.ru", "login1", LocalDate.now());
@@ -416,6 +396,7 @@ public class InMemoryUserStorageTest {
 
         assertEquals(1, mutualUser1User2.size(), "Неверное количество общих друзей");
     }
+
 
     @Test
     public void testFindUserByID() {

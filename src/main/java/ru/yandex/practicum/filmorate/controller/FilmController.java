@@ -3,16 +3,18 @@ package ru.yandex.practicum.filmorate.controller;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
 import javax.validation.Valid;
-import java.util.ArrayList;
+import javax.validation.constraints.Positive;
 import java.util.List;
 
 @RestController
 @Slf4j
+@Validated
 @AllArgsConstructor
 @RequestMapping("/films")
 public class FilmController {
@@ -31,8 +33,8 @@ public class FilmController {
     }
 
     @GetMapping
-    public List<Film> findAll() {
-        return filmService.findAll();
+    public Object[] findAll() {
+        return filmService.findAll().values().toArray();
     }
 
     @PutMapping("/{id}/like/{userId}")
@@ -46,8 +48,8 @@ public class FilmController {
     }
 
     @GetMapping(value = "/popular", produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<Film> getTop10ByLikes(@RequestParam(defaultValue = "10", required = false) Integer count) {
-        return new ArrayList<>(filmService.getTop10ByLikes(count));
+    public List<Film> getTopByLikes(@RequestParam(defaultValue = "10")  @Positive Integer count) {
+        return filmService.getTopByLikes(count);
     }
 
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)

@@ -12,16 +12,15 @@ import java.util.*;
 @Component
 public class InMemoryUserStorage implements UserStorage {
 
-    private final List<User> users = new ArrayList<>();
+    private final Map<Integer, User> users = new HashMap<>();
 
     private int generatedID = 0;
 
 
     @Override
     public User create(User newUser) {
-        validateUser(newUser);
 
-        for (User existingUser : users) {
+        for (User existingUser : users.values()) {
             if (existingUser.getEmail().equals(newUser.getEmail())) {
                 log.warn("Регистрация пользователя не удалась. Пользователь с электронной почтой {} уже существует.",
                         newUser.getEmail());
@@ -37,7 +36,7 @@ public class InMemoryUserStorage implements UserStorage {
         }
 
         newUser.setId(generateID());
-        users.add(newUser);
+        users.put(newUser.getId(), newUser);
 
         log.info("Пользователь успешно зарегистрирован. Email: {}", newUser.getEmail());
         return newUser;
@@ -45,28 +44,43 @@ public class InMemoryUserStorage implements UserStorage {
 
     @Override
     public User put(User updatedUser) {
-        validateUser(updatedUser);
 
         int idToUpdate = updatedUser.getId();
 
-        for (User user : users) {
-            if (user.getId() == idToUpdate) {
-                user.setEmail(updatedUser.getEmail());
-                user.setName(updatedUser.getName());
-                user.setBirthday(updatedUser.getBirthday());
-                user.setLogin(updatedUser.getLogin());
+        if (!users.containsKey(idToUpdate)) {
+            log.warn("Пользователь с id {} для обновления не найден.", idToUpdate);
+            throw new EntityNotFoundException(User.class, "Пользователь с id " + idToUpdate + " не найден.");
+        }
 
-                log.info("Информация о пользователе с id {} успешно обновлена.", idToUpdate);
-                return user;
+        for (User user : users.values()) {
+            if (user.getId() != idToUpdate && user.getEmail().equals(updatedUser.getEmail())) {
+                log.warn("Обновление пользователя не удалось. Пользователь с электронной почтой {} уже существует.",
+                        updatedUser.getEmail());
+                throw new EntityAlreadyExistsException(User.class, "Пользователь с электронной почтой " +
+                        updatedUser.getEmail() + " уже зарегистрирован.");
+            }
+
+            if (user.getId() != idToUpdate && user.getLogin().equals(updatedUser.getLogin())) {
+                log.warn("Обновление пользователя не удалось. Пользователь с логином {} уже существует.",
+                        updatedUser.getLogin());
+                throw new EntityAlreadyExistsException(User.class, "Пользователь с логином " +
+                        updatedUser.getLogin() + " уже зарегистрирован.");
             }
         }
 
-        log.warn("Пользователь c id {} для обновления не найден.", idToUpdate);
-        throw new EntityNotFoundException(User.class, "Пользователь с id " + idToUpdate + " не найден.");
+        User userToUpdate = users.get(idToUpdate);
+        userToUpdate.setEmail(updatedUser.getEmail());
+        userToUpdate.setName(updatedUser.getName());
+        userToUpdate.setBirthday(updatedUser.getBirthday());
+        userToUpdate.setLogin(updatedUser.getLogin());
+
+        log.info("Информация о пользователе с id {} успешно обновлена.", idToUpdate);
+        return userToUpdate;
+
     }
 
     @Override
-    public List<User> findAll() {
+    public Map<Integer, User> findAll() {
         return users;
     }
 
@@ -167,7 +181,7 @@ public class InMemoryUserStorage implements UserStorage {
             List<User> userFriends = new ArrayList<>();
 
             for (Long friendId : friendIds) {
-                for (User friend : users) {
+                for (User friend : users.values()) {
                     if (friend.getId().equals(friendId.intValue())) {
                         userFriends.add(friend);
                         break;
@@ -180,6 +194,7 @@ public class InMemoryUserStorage implements UserStorage {
             log.warn("Пользователь с id {} не найден.", userID);
             throw new EntityNotFoundException(User.class, "Пользователь с ID " + userID + " не найден.");
         }
+
     }
 
     @Override
@@ -207,20 +222,12 @@ public class InMemoryUserStorage implements UserStorage {
 
     @Override
     public User findUserByID(Integer userID) {
-        for (User user : users) {
-            if (user.getId().equals(userID)) {
-                return user;
-            }
-        }
-        throw new EntityNotFoundException(User.class, "Пользователь с ID " + userID + " не найден.");
+        Optional<User> userOptional = users.values().stream().filter(user -> user.getId().equals(userID)).findFirst();
+
+        return userOptional.orElseThrow(() ->
+                new EntityNotFoundException(User.class, "Пользователь с ID " + userID + " не найден."));
     }
 
-    private void validateUser(User user) {
-        if (user.getName() == null || user.getName().isBlank()) {
-            log.info("Имя отсутствует, в качестве имени будет использован логин {}", user.getLogin());
-            user.setName(user.getLogin());
-        }
-    }
 
     private int generateID() {
         return ++generatedID;

@@ -6,7 +6,6 @@ import ru.yandex.practicum.filmorate.exceptions.EntityAlreadyExistsException;
 import ru.yandex.practicum.filmorate.exceptions.EntityNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -15,21 +14,14 @@ import java.util.stream.Collectors;
 @Component
 public class InMemoryFilmStorage implements FilmStorage {
 
-    private final List<Film> films = new ArrayList<>();
-
-    private final InMemoryUserStorage inMemoryUserStorage;
+    private final Map<Integer, Film> films = new HashMap<>();
 
     private int generatedID = 0;
 
 
-    public InMemoryFilmStorage(InMemoryUserStorage inMemoryUserStorage) {
-        this.inMemoryUserStorage = inMemoryUserStorage;
-    }
-
-
     @Override
     public Film create(Film film) {
-        for (Film existingFilm : films) {
+        for (Film existingFilm : films.values()) {
             if (existingFilm.getName().equals(film.getName()) &&
                     existingFilm.getDescription().equals(film.getDescription()) &&
                     existingFilm.getDuration() == film.getDuration() &&
@@ -43,7 +35,7 @@ public class InMemoryFilmStorage implements FilmStorage {
 
         film.setId(generateID());
 
-        films.add(film);
+        films.put(film.getId(), film);
         log.info("Фильм успешно зарегистрирован. Название: {}", film.getName());
         return film;
     }
@@ -52,7 +44,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     public Film put(Film updatedFilm) {
         int idToUpdate = updatedFilm.getId();
 
-        for (Film film : films) {
+        for (Film film : films.values()) {
             if (film.getId() == idToUpdate) {
                 film.setDescription(updatedFilm.getDescription());
                 film.setName(updatedFilm.getName());
@@ -68,129 +60,96 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public List<Film> findAll() {
+    public Map<Integer, Film> findAll() {
         return films;
     }
 
     @Override
     public Film addLike(Integer filmId, Integer userId) {
-
         Film film = findFilmByID(filmId);
-        User user = inMemoryUserStorage.findUserByID(userId);
 
         if (film == null) {
             log.warn("Фильм с ID {} не найден.", filmId);
-            throw new EntityNotFoundException(User.class, "Фильм с ID " + filmId + " не найден.");
-        }
-
-        if (user == null) {
-            log.warn("Пользователь с ID {} не найден.", userId);
-            throw new EntityNotFoundException(User.class, "Пользователь с ID " + userId + " не найден.");
+            throw new EntityNotFoundException(Film.class, "Фильм с ID " + filmId + " не найден.");
         }
 
         Set<Long> listOfFans = film.getLikes();
-        long idToAdd = user.getId();
+        long idToAdd = userId;
 
         if (listOfFans.contains(idToAdd)) {
-            log.warn("Пользователь с электронной почтой {} уже добавил фильм с названием {} в понравившиеся.",
-                    user.getEmail(), film.getName());
-            throw new EntityAlreadyExistsException(User.class, "Пользователь с электронной почтой " +
-                    user.getEmail() + " уже добавил в список понравившихся фильм с названием " +
+            log.warn("Пользователь с ID {} уже добавил фильм с названием {} в понравившиеся.",
+                    userId, film.getName());
+            throw new EntityAlreadyExistsException(User.class, "Пользователь с ID " +
+                    userId + " уже добавил в список понравившихся фильм с названием " +
                     film.getName() + ".");
         }
 
         listOfFans.add(idToAdd);
-        log.info("Фильм с названием {} успешно добавлен в список понравившихся фильмов пользователя {}.",
-                film.getName(), user.getEmail());
+        log.info("Фильм с названием {} успешно добавлен в список понравившихся фильмов пользователя с ID {}.",
+                film.getName(), userId);
         return film;
-
     }
 
     @Override
     public Film removeLike(Integer filmId, Integer userId) {
-
         Film film = findFilmByID(filmId);
-        User user = inMemoryUserStorage.findUserByID(userId);
-
         if (film == null) {
             log.warn("Фильм с ID {} не найден.", filmId);
-            throw new EntityNotFoundException(User.class, "Фильм с ID " + filmId + " не найден.");
-        }
-
-        if (user == null) {
-            log.warn("Пользователь с ID {} не найден.", userId);
-            throw new EntityNotFoundException(User.class, "Пользователь с ID " + userId + " не найден.");
+            throw new EntityNotFoundException(Film.class, "Фильм с ID " + filmId + " не найден.");
         }
 
         Set<Long> listOfFans = film.getLikes();
-        long idToRemove = user.getId();
+        long idToRemove = userId;
 
-        for (Long fansIDs : listOfFans) {
-            if (!listOfFans.contains(idToRemove)) {
-                log.warn("Фильм с названием {} не найден в списке понравившихся фильмов пользователя с " +
-                                "электронной почтой {}.", film.getName(), user.getEmail());
-                throw new EntityNotFoundException(User.class, "Фильм с названием " + film.getName() +
-                        " не найден в списке понравившихся фильмов пользователя с электронной почтой " + user.getEmail()
-                        + ".");
-            }
+        if (!listOfFans.contains(idToRemove)) {
+            log.warn("Фильм с названием {} не найден в списке понравившихся фильмов пользователя с ID {}.",
+                    film.getName(), userId);
+            throw new EntityNotFoundException(User.class, "Фильм с названием " + film.getName() +
+                    " не найден в списке понравившихся фильмов пользователя с ID " + userId + ".");
         }
-        listOfFans.remove(idToRemove);
-        log.info("Фильм с названием {} успешно удалён из списка понравившихся фильмов пользователя {}.",
-                film.getName(), user.getEmail());
-        return film;
 
+        listOfFans.remove(idToRemove);
+        log.info("Фильм с названием {} успешно удалён из списка понравившихся фильмов пользователя с ID {}.",
+                film.getName(), userId);
+        return film;
     }
 
-    @Override
-    public List<Film> getTop10ByLikes(Integer count) {
 
-        List<Film> filmsCopy = new ArrayList<>(films);
+    @Override
+    public List<Film> getTopByLikes(Integer count) {
+        Map<Integer, Film> filmsCopy = new HashMap<>(films);
 
         Comparator<Film> compareByLikes = Comparator.comparingInt(film -> film.getLikes().size());
 
-        List<Film> topFilms = filmsCopy.stream()
+        List<Film> topFilms = filmsCopy.values().stream()
                 .sorted(compareByLikes.reversed())
                 .limit(count)
                 .collect(Collectors.toList());
 
         return topFilms;
-
     }
 
     @Override
     public Film findFilmByID(Integer filmID) {
-        for (Film film : films) {
-            if (film.getId().equals(filmID)) {
-                return film;
-            }
-        }
-        throw new EntityNotFoundException(Film.class, "Фильм с ID " + filmID + " не найден.");
+        Optional<Film> filmOptional = films.values().stream()
+                .filter(film -> film.getId().equals(filmID))
+                .findFirst();
+
+        return filmOptional.orElseThrow(() ->
+                new EntityNotFoundException(Film.class, "Фильм с ID " + filmID + " не найден."));
     }
 
-
-    public Set<User> getAllLikes(Integer filmID) {
+    @Override
+    public Set<Long> getAllLikes(Integer filmID) {
         Film film = findFilmByID(filmID);
-
         if (film != null) {
-            Set<User> filmFans = new HashSet<>();
-            Set<Long> fansIds = film.getLikes();
-
-            List<User> allUsers = inMemoryUserStorage.findAll();
-
-            for (Long fanId : fansIds) {
-                for (User user : allUsers) {
-                    if (user.getId().equals(fanId.intValue())) {
-                        filmFans.add(user);
-                        break;
-                    }
-                }
-            }
-            return filmFans;
+            return film.getLikes();
         } else {
             log.warn("Фильм с id {} не найден.", filmID);
-            throw new EntityNotFoundException(User.class, "Фильм с ID " + filmID + " не найден.");
+            throw new EntityNotFoundException(Film.class, "Фильм с ID " + filmID + " не найден.");
         }
     }
+
 
     private int generateID() {
         return ++generatedID;
