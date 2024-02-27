@@ -1,96 +1,62 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exceptions.EntityAlreadyExistsException;
-import ru.yandex.practicum.filmorate.exceptions.EntityNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.UserService;
 
 import javax.validation.Valid;
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
 @Slf4j
+@AllArgsConstructor
 @RequestMapping("/users")
 public class UserController {
 
-    private final List<User> users = new ArrayList<>();
-
-    private int generatedID = 0;
-
+    private UserService userService;
 
 
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public User create(@Valid @RequestBody User newUser) {
-
-        validateUser(newUser);
-
-        for (User existingUser : users) {
-            if (existingUser.getEmail().equals(newUser.getEmail())) {
-                log.warn("Регистрация пользователя не удалась. Пользователь с электронной почтой {} уже существует.",
-                        newUser.getEmail());
-
-                throw new EntityAlreadyExistsException(User.class, "Пользователь с электронной почтой " +
-                         newUser.getEmail() + " уже зарегистрирован.");
-            }
-            if (existingUser.getLogin().equals(newUser.getLogin())) {
-                log.warn("Регистрация пользователя не удалась. Пользователь с логином {} уже существует.",
-                        newUser.getLogin());
-
-                throw new EntityAlreadyExistsException(User.class, "Пользователь с логином " +
-                        newUser.getLogin() + " уже зарегистрирован.");
-            }
-        }
-
-        newUser.setId(generateID());
-        users.add(newUser);
-
-        log.info("Пользователь успешно зарегистрирован. Email: {}", newUser.getEmail());
-        return newUser;
-
+        return userService.create(newUser);
     }
 
     @PutMapping
     public User put(@Valid @RequestBody User updatedUser) {
-
-        validateUser(updatedUser);
-
-        int idToUpdate = updatedUser.getId();
-
-        for (User user : users) {
-            if (user.getId() == idToUpdate) {
-                user.setEmail(updatedUser.getEmail());
-                user.setName(updatedUser.getName());
-                user.setBirthday(updatedUser.getBirthday());
-                user.setLogin(updatedUser.getLogin());
-
-                log.info("Информация о пользователе с id {} успешно обновлена.", idToUpdate);
-                return user;
-            }
-        }
-
-        log.warn("Пользователь c id {} для обновления не найден.", idToUpdate);
-        throw new EntityNotFoundException(User.class, "Пользователь с id " + idToUpdate + " не найден.");
-
+        return userService.put(updatedUser);
     }
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public List<User> findAll() {
-        return users;
+        return userService.findAll();
     }
 
-
-    private int generateID() {
-        return ++generatedID;
+    @PutMapping("/{id}/friends/{friendId}")
+    public User addFriend(@PathVariable("id") Integer userId, @PathVariable("friendId") Integer friendId) {
+        return userService.addFriend(userId, friendId);
     }
 
-    private void validateUser(User user) {
-        if (user.getName() == null || user.getName().isBlank()) {
-            log.info("Имя отсутствует, в качестве имени будет использован логин {}", user.getLogin());
-            user.setName(user.getLogin());
-        }
+    @DeleteMapping("/{id}/friends/{friendId}")
+    public User removeFriend(@PathVariable("id") Integer userId, @PathVariable("friendId") Integer friendId) {
+        return userService.removeFriend(userId, friendId);
+    }
+
+    @GetMapping(value = "/{id}/friends", produces = MediaType.APPLICATION_JSON_VALUE)
+    public List<User> getAllFriends(@PathVariable("id") Integer userID) {
+        return userService.getAllFriends(userID);
+    }
+
+    @GetMapping(value = "/{id}/friends/common/{otherId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public List<User> getMutualFriends(@PathVariable("id") Integer user1ID, @PathVariable("otherId") Integer user2ID) {
+        return userService.getMutualFriends(user1ID, user2ID);
+    }
+
+    @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public User findUserByID(@PathVariable("id") Integer userID) {
+        return userService.findUserByID(userID);
     }
 
 }
