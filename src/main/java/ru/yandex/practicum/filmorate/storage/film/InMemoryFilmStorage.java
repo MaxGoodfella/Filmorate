@@ -122,10 +122,16 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public Film findFilmByID(Integer filmID) {
-        Film film = films.get(filmID);
+//        Film film = films.get(filmID);
+//
+//        return Optional.ofNullable(film).orElseThrow(() -> new EntityNotFoundException(User.class,
+//                        "Пользователь с ID " + filmID + " не найден."));
 
-        return Optional.ofNullable(film).orElseThrow(() -> new EntityNotFoundException(User.class,
-                        "Пользователь с ID " + filmID + " не найден."));
+        Film film = films.get(filmID);
+        if (film == null) {
+            throw new EntityNotFoundException(User.class, "Фильм с ID " + filmID + " не найден.");
+        }
+        return film;
     }
 
     @Override

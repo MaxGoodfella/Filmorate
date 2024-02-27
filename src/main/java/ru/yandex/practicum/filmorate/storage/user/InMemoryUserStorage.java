@@ -162,9 +162,7 @@ public class InMemoryUserStorage implements UserStorage {
         List<User> userFriends = new ArrayList<>();
         for (Integer friendId : friendIds) {
             User friend = findUserByID(friendId);
-            // if (friend != null) {
-                userFriends.add(friend);
-            // }
+            userFriends.add(friend);
         }
         return userFriends;
     }
@@ -184,10 +182,15 @@ public class InMemoryUserStorage implements UserStorage {
 
     @Override
     public User findUserByID(Integer userID) {
+//        User user = users.get(userID);
+//
+//        return Optional.ofNullable(user).orElseThrow(() -> new EntityNotFoundException(User.class,
+//                        "Пользователь с ID " + userID + " не найден."));
         User user = users.get(userID);
-
-        return Optional.ofNullable(user).orElseThrow(() -> new EntityNotFoundException(User.class,
-                        "Пользователь с ID " + userID + " не найден."));
+        if (user == null) {
+            throw new EntityNotFoundException(User.class, "Пользователь с ID " + userID + " не найден.");
+        }
+        return user;
     }
 
 

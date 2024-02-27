@@ -11,7 +11,6 @@ public interface FilmStorage {
 
     Film put(Film updatedFilm);
 
-    // Map<Integer, Film> findAll();
     List<Film> findAll();
 
     Film addLike(Integer filmId, Integer userId);
