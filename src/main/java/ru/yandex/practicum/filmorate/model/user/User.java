@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.model;
+package ru.yandex.practicum.filmorate.model.user;
 
 import lombok.Data;
 import lombok.Singular;
@@ -30,6 +30,8 @@ public class User {
 
     @Singular
     private final Set<Integer> friends = new HashSet<>();
+
+    private UserFriendship friendship;
 
     public User(@Email @NotEmpty String email, @NotBlank @Pattern(regexp = "\\S*") String login,
                 @NotNull @PastOrPresent LocalDate birthday) {

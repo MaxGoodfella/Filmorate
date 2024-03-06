@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.model;
+package ru.yandex.practicum.filmorate.model.film;
 
 import lombok.Data;
 import lombok.Singular;
@@ -34,6 +34,10 @@ public class Film {
 
     @Singular
     private final Set<Integer> likes = new HashSet<>();
+
+    private FilmGenre genre;
+
+    private FilmRating rating;
 
 
     public Film(@NotBlank String name, @NotNull @Size(min = 1, max = 200) String description, @NotNull @MinimumDate LocalDate releaseDate,

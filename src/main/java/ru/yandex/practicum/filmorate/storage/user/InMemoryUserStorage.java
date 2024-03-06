@@ -4,7 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exceptions.EntityAlreadyExistsException;
 import ru.yandex.practicum.filmorate.exceptions.EntityNotFoundException;
-import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.model.user.User;
 
 import java.util.*;
 
@@ -182,10 +182,6 @@ public class InMemoryUserStorage implements UserStorage {
 
     @Override
     public User findUserByID(Integer userID) {
-//        User user = users.get(userID);
-//
-//        return Optional.ofNullable(user).orElseThrow(() -> new EntityNotFoundException(User.class,
-//                        "Пользователь с ID " + userID + " не найден."));
         User user = users.get(userID);
         if (user == null) {
             throw new EntityNotFoundException(User.class, "Пользователь с ID " + userID + " не найден.");
