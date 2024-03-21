@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.model.film;
+package ru.yandex.practicum.filmorate.model;
 
 import lombok.Data;
 import lombok.Singular;
@@ -35,9 +35,9 @@ public class Film {
     @Singular
     private final Set<Integer> likes = new HashSet<>();
 
-    private FilmGenre genre;
+    private Integer genre;
 
-    private FilmRating rating;
+    private Integer rating;
 
 
     public Film(@NotBlank String name, @NotNull @Size(min = 1, max = 200) String description, @NotNull @MinimumDate LocalDate releaseDate,
@@ -48,4 +48,13 @@ public class Film {
         this.duration = duration;
     }
 
+    public Film(Integer id, String name, String description, LocalDate releaseDate, int duration, Integer genre, Integer rating) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.releaseDate = releaseDate;
+        this.duration = duration;
+        this.genre = genre;
+        this.rating = rating;
+    }
 }

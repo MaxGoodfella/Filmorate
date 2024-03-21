@@ -1,25 +1,42 @@
 package ru.yandex.practicum.filmorate.service;
 
-import ru.yandex.practicum.filmorate.model.user.User;
+import org.springframework.web.bind.annotation.RequestBody;
+import ru.yandex.practicum.filmorate.model.User;
 
+import javax.validation.Valid;
 import java.util.List;
 
 public interface UserService {
 
-    User create(User user);
-
-    User put(User updatedUser);
+    User findById(Integer id);
 
     List<User> findAll();
 
-    User addFriend(Integer userId, Integer friendId);
+    User save(User newUser);
 
-    User removeFriend(Integer userId, Integer friendId);
+    void saveMany(List<User> newUsers);
 
-    List<User> getAllFriends(Integer userID);
+    boolean deleteById(Integer userID);
 
-    List<User> getMutualFriends(Integer user1ID, Integer user2ID);
+    boolean deleteAll();
 
-    User findUserByID(Integer userID);
+
+
+
+//    User create(User user);
+//
+//    User put(User updatedUser);
+//
+//    List<User> findAll();
+//
+//    User addFriend(Integer userId, Integer friendId);
+//
+//    User removeFriend(Integer userId, Integer friendId);
+//
+//    List<User> getAllFriends(Integer userID);
+//
+//    List<User> getMutualFriends(Integer user1ID, Integer user2ID);
+//
+//    User findUserByID(Integer userID);
 
 }

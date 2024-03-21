@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.model.user.User;
+import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
 
 import javax.validation.Valid;
@@ -16,17 +16,27 @@ import java.util.List;
 @RequestMapping("/users")
 public class UserController {
 
+
     private UserService userService;
 
+//    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+//    public User saveOne(@Valid @RequestBody User newUser) {
+//        return userService.save(newUser);
+//    }
 
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public User create(@Valid @RequestBody User newUser) {
-        return userService.create(newUser);
+    public User save(@Valid @RequestBody User newUser) {
+        return userService.save(newUser);
     }
 
-    @PutMapping
-    public User put(@Valid @RequestBody User updatedUser) {
-        return userService.put(updatedUser);
+    @PostMapping(value = "/multiple", produces = MediaType.APPLICATION_JSON_VALUE)
+    public void saveMany(@Valid @RequestBody List<User> newUsers) {
+        userService.saveMany(newUsers);
+    }
+
+    @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public User findByID(@PathVariable("id") Integer userID) {
+        return userService.findById(userID);
     }
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
@@ -34,29 +44,61 @@ public class UserController {
         return userService.findAll();
     }
 
-    @PutMapping("/{id}/friends/{friendId}")
-    public User addFriend(@PathVariable("id") Integer userId, @PathVariable("friendId") Integer friendId) {
-        return userService.addFriend(userId, friendId);
+    @DeleteMapping(value = "/{id}")
+    public boolean deleteById(@PathVariable("id") Integer userID) {
+        return userService.deleteById(userID);
     }
 
-    @DeleteMapping("/{id}/friends/{friendId}")
-    public User removeFriend(@PathVariable("id") Integer userId, @PathVariable("friendId") Integer friendId) {
-        return userService.removeFriend(userId, friendId);
+    @DeleteMapping
+    public boolean deleteAll() {
+        return userService.deleteAll();
     }
 
-    @GetMapping(value = "/{id}/friends", produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<User> getAllFriends(@PathVariable("id") Integer userID) {
-        return userService.getAllFriends(userID);
-    }
 
-    @GetMapping(value = "/{id}/friends/common/{otherId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<User> getMutualFriends(@PathVariable("id") Integer user1ID, @PathVariable("otherId") Integer user2ID) {
-        return userService.getMutualFriends(user1ID, user2ID);
-    }
 
-    @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public User findUserByID(@PathVariable("id") Integer userID) {
-        return userService.findUserByID(userID);
-    }
+
+
+//    private UserService userService;
+//
+//
+//    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+//    public User create(@Valid @RequestBody User newUser) {
+//        return userService.create(newUser);
+//    }
+//
+//    @PutMapping
+//    public User put(@Valid @RequestBody User updatedUser) {
+//        return userService.put(updatedUser);
+//    }
+//
+//    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+//    public List<User> findAll() {
+//        return userService.findAll();
+//    }
+//
+//    @PutMapping("/{id}/friends/{friendId}")
+//    public User addFriend(@PathVariable("id") Integer userId, @PathVariable("friendId") Integer friendId) {
+//        return userService.addFriend(userId, friendId);
+//    }
+//
+//    @DeleteMapping("/{id}/friends/{friendId}")
+//    public User removeFriend(@PathVariable("id") Integer userId, @PathVariable("friendId") Integer friendId) {
+//        return userService.removeFriend(userId, friendId);
+//    }
+//
+//    @GetMapping(value = "/{id}/friends", produces = MediaType.APPLICATION_JSON_VALUE)
+//    public List<User> getAllFriends(@PathVariable("id") Integer userID) {
+//        return userService.getAllFriends(userID);
+//    }
+//
+//    @GetMapping(value = "/{id}/friends/common/{otherId}", produces = MediaType.APPLICATION_JSON_VALUE)
+//    public List<User> getMutualFriends(@PathVariable("id") Integer user1ID, @PathVariable("otherId") Integer user2ID) {
+//        return userService.getMutualFriends(user1ID, user2ID);
+//    }
+//
+//    @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+//    public User findUserByID(@PathVariable("id") Integer userID) {
+//        return userService.findUserByID(userID);
+//    }
 
 }
