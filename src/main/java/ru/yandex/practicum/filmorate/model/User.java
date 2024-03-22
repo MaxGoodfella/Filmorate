@@ -1,6 +1,8 @@
 package ru.yandex.practicum.filmorate.model;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.Singular;
 
 import javax.validation.constraints.*;
@@ -10,6 +12,8 @@ import java.util.Set;
 
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class User {
 
     private Integer id;
@@ -34,21 +38,21 @@ public class User {
 //
 //    private UserFriendship friendship;
 
-    public User(@Email @NotEmpty String email, @NotBlank @Pattern(regexp = "\\S*") String login,
-                @NotNull @PastOrPresent LocalDate birthday) {
-        this.email = email;
-        this.login = login;
-        this.birthday = birthday;
-    }
-
-    public User(Integer id, String name, @Email @NotEmpty String email, @NotBlank @Pattern(regexp = "\\S*") String login,
-                @NotNull @PastOrPresent LocalDate birthday) {
-        this.id = id;
-        this.name = name;
-        this.email = email;
-        this.login = login;
-        this.birthday = birthday;
-    }
+//    public User(@Email @NotEmpty String email, @NotBlank @Pattern(regexp = "\\S*") String login,
+//                @NotNull @PastOrPresent LocalDate birthday) {
+//        this.email = email;
+//        this.login = login;
+//        this.birthday = birthday;
+//    }
+//
+//    public User(Integer id, String name, @Email @NotEmpty String email, @NotBlank @Pattern(regexp = "\\S*") String login,
+//                @NotNull @PastOrPresent LocalDate birthday) {
+//        this.id = id;
+//        this.name = name;
+//        this.email = email;
+//        this.login = login;
+//        this.birthday = birthday;
+//    }
 
 
 

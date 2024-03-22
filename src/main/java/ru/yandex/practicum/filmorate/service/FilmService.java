@@ -8,18 +8,17 @@ import java.util.Set;
 
 public interface FilmService {
 
+    Film save(Film newFilm);
+
+    void saveMany(List<Film> newFilms);
+
     Film findById(Integer id);
 
     List<Film> findAll();
 
-    Film save(Film newFilm);
-
     boolean deleteById(Integer filmID);
 
     boolean deleteAll();
-
-
-
 
 
 

@@ -16,15 +16,6 @@ public class UserServiceImpl implements UserService {
 
     private UserRepository userRepository;
 
-    @Override
-    public User findById(Integer id) {
-        return userRepository.findById(id);
-    }
-
-    @Override
-    public List<User> findAll() {
-        return userRepository.findAll();
-    }
 
     @Override
     public User save(User newUser) {
@@ -34,6 +25,16 @@ public class UserServiceImpl implements UserService {
     @Override
     public void saveMany(List<User> newUsers) {
         userRepository.saveMany(newUsers);
+    }
+
+    @Override
+    public User findById(Integer id) {
+        return userRepository.findById(id);
+    }
+
+    @Override
+    public List<User> findAll() {
+        return userRepository.findAll();
     }
 
     @Override

@@ -23,38 +23,6 @@ public class RatingRepositoryImpl implements RatingRepository {
 
     private final JdbcTemplate jdbcTemplate;
 
-    @Override
-    public List<Rating> findAll() {
-        return jdbcTemplate.query(
-                "select * from FILM_RATING",
-                ratingRowMapper());
-    }
-
-    @Override
-    public Rating findRatingByID(Integer ratingID) {
-        Rating rating = jdbcTemplate.queryForObject(
-                "select * from FILM_RATING where rating_id = ?",
-                ratingRowMapper(),
-                ratingID);
-
-        return rating;
-    }
-
-//    @Override
-//    public Rating save(Rating newRating) {
-//        String sqlQuery = "insert into FILM_RATING(RATING_NAME) " +
-//                "values (?)";
-//        jdbcTemplate.update(sqlQuery,
-//                newRating.getName());
-//
-//        return newRating;
-//    }
-        // работает, но надо подумать, как сделать так, чтобы он не пускал рейтинг с таким же именем - done with unique
-        // есть проблема - когда создаю новый рейтинг с тем же именем, ему дается айдишник всё равно,
-        // а так быть не должно!!! - надо фиксить
-
-        // и ещё, кстати, он в теле ответа не показывает айди, т.е. ему дают айди, но пишет null почему-то
-    // }
 
     @Override
     public Rating save(Rating rating) {
@@ -85,6 +53,24 @@ public class RatingRepositoryImpl implements RatingRepository {
     }
 
     @Override
+    public Rating findRatingByID(Integer ratingID) {
+        Rating rating = jdbcTemplate.queryForObject(
+                "select * from FILM_RATING where rating_id = ?",
+                ratingRowMapper(),
+                ratingID);
+
+        return rating;
+    }
+
+    @Override
+    public List<Rating> findAll() {
+        return jdbcTemplate.query(
+                "select * from FILM_RATING",
+                ratingRowMapper());
+    }
+
+
+    @Override
     public boolean deleteById(Integer ratingID) {
         String sqlQuery = "delete from FILM_RATING where rating_id = ?";
 
@@ -99,7 +85,6 @@ public class RatingRepositoryImpl implements RatingRepository {
     }
 
 
-
     private static RowMapper<Rating> ratingRowMapper() {
         return (rs, rowNum) -> new Rating(
                 rs.getInt("rating_id"),
@@ -110,4 +95,5 @@ public class RatingRepositoryImpl implements RatingRepository {
         return Map.of(
                 "rating_name", rating.getName());
     }
+
 }

@@ -14,15 +14,6 @@ public class GenreServiceImpl implements GenreService {
 
     private GenreRepository genreRepository;
 
-    @Override
-    public List<Genre> findAll() {
-        return genreRepository.findAll();
-    }
-
-    @Override
-    public Genre findGenreByID(Integer genreID) {
-        return genreRepository.findGenreByID(genreID);
-    }
 
     @Override
     public Genre save(Genre newGenre) {
@@ -32,6 +23,16 @@ public class GenreServiceImpl implements GenreService {
     @Override
     public void saveMany(List<Genre> newGenres) {
         genreRepository.saveMany(newGenres);
+    }
+
+    @Override
+    public List<Genre> findAll() {
+        return genreRepository.findAll();
+    }
+
+    @Override
+    public Genre findGenreByID(Integer genreID) {
+        return genreRepository.findGenreByID(genreID);
     }
 
     @Override

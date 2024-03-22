@@ -6,13 +6,13 @@ import java.util.List;
 
 public interface UserRepository {
 
-    User findById(Integer id);
-
-    List<User> findAll();
-
     User save(User newUser);
 
     void saveMany(List<User> newUsers);
+
+    User findById(Integer id);
+
+    List<User> findAll();
 
     boolean deleteById(Integer userID);
 

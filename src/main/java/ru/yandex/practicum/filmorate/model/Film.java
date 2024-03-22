@@ -1,6 +1,8 @@
 package ru.yandex.practicum.filmorate.model;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.Singular;
 import ru.yandex.practicum.filmorate.annotations.MinimumDate;
 
@@ -14,6 +16,8 @@ import java.util.Set;
 
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class Film {
     private Integer id;
 
@@ -32,29 +36,13 @@ public class Film {
     @Positive
     private int duration;
 
-    @Singular
-    private final Set<Integer> likes = new HashSet<>();
+//    @Singular
+//    private final Set<Integer> likes = new HashSet<>();
+//
+//    private Integer genre;
+//
+//    private Integer rating;
 
-    private Integer genre;
-
-    private Integer rating;
 
 
-    public Film(@NotBlank String name, @NotNull @Size(min = 1, max = 200) String description, @NotNull @MinimumDate LocalDate releaseDate,
-                @NotNull @Positive int duration) {
-        this.name = name;
-        this.description = description;
-        this.releaseDate = releaseDate;
-        this.duration = duration;
-    }
-
-    public Film(Integer id, String name, String description, LocalDate releaseDate, int duration, Integer genre, Integer rating) {
-        this.id = id;
-        this.name = name;
-        this.description = description;
-        this.releaseDate = releaseDate;
-        this.duration = duration;
-        this.genre = genre;
-        this.rating = rating;
-    }
 }

@@ -16,6 +16,17 @@ public class FilmServiceImpl implements FilmService {
 
     private FilmRepository filmRepository;
 
+
+    @Override
+    public Film save(Film newFilm) {
+        return filmRepository.save(newFilm);
+    }
+
+    @Override
+    public void saveMany(List<Film> newFilms) {
+        filmRepository.saveMany(newFilms);
+    }
+
     @Override
     public Film findById(Integer id) {
         return filmRepository.findById(id);
@@ -27,11 +38,6 @@ public class FilmServiceImpl implements FilmService {
     }
 
     @Override
-    public Film save(Film newFilm) {
-        return filmRepository.save(newFilm);
-    }
-
-    @Override
     public boolean deleteById(Integer filmID) {
         return filmRepository.deleteById(filmID);
     }
@@ -40,6 +46,11 @@ public class FilmServiceImpl implements FilmService {
     public boolean deleteAll() {
         return filmRepository.deleteAll();
     }
+
+
+
+
+
 
 
 //    private FilmStorage filmStorage;

@@ -16,42 +16,54 @@ import java.util.List;
 @RequestMapping("/users")
 public class UserController {
 
-
     private UserService userService;
 
-//    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-//    public User saveOne(@Valid @RequestBody User newUser) {
-//        return userService.save(newUser);
-//    }
 
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public User save(@Valid @RequestBody User newUser) {
-        return userService.save(newUser);
+        log.info("Start saving user {}", newUser);
+        User savedUser = userService.save(newUser);
+        log.info("Finish saving user {}", savedUser);
+        return savedUser;
     }
 
     @PostMapping(value = "/multiple", produces = MediaType.APPLICATION_JSON_VALUE)
     public void saveMany(@Valid @RequestBody List<User> newUsers) {
+        log.info("Start saving users {}", newUsers);
         userService.saveMany(newUsers);
+        log.info("Finish saving users {}", newUsers);
     }
 
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public User findByID(@PathVariable("id") Integer userID) {
-        return userService.findById(userID);
+        log.info("Start fetching user with id = {}", userID);
+        User fetchedUser = userService.findById(userID);
+        log.info("Finish fetching user with id = {}", fetchedUser.getId());
+        return fetchedUser;
     }
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public List<User> findAll() {
-        return userService.findAll();
+        log.info("Start fetching all users");
+        List<User> fetchedUsers = userService.findAll();
+        log.info("Finish fetching all users");
+        return fetchedUsers;
     }
 
     @DeleteMapping(value = "/{id}")
     public boolean deleteById(@PathVariable("id") Integer userID) {
-        return userService.deleteById(userID);
+        log.info("Start deleting user with id = {}", userID);
+        boolean isDeleted = userService.deleteById(userID);
+        log.info("Finish deleting user with id = {}", userID);
+        return isDeleted;
     }
 
     @DeleteMapping
     public boolean deleteAll() {
-        return userService.deleteAll();
+        log.info("Start deleting all users");
+        boolean areDeleted = userService.deleteAll();
+        log.info("Finish deleting all users");
+        return areDeleted;
     }
 
 

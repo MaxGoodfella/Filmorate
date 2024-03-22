@@ -14,15 +14,6 @@ public class RatingServiceImpl implements RatingService {
 
     private RatingRepository ratingRepository;
 
-    @Override
-    public List<Rating> findAll() {
-        return ratingRepository.findAll();
-    }
-
-    @Override
-    public Rating findRatingByID(Integer ratingID) {
-        return ratingRepository.findRatingByID(ratingID);
-    }
 
     @Override
     public Rating save(Rating newRating) {
@@ -35,6 +26,16 @@ public class RatingServiceImpl implements RatingService {
     }
 
     @Override
+    public List<Rating> findAll() {
+        return ratingRepository.findAll();
+    }
+
+    @Override
+    public Rating findRatingByID(Integer ratingID) {
+        return ratingRepository.findRatingByID(ratingID);
+    }
+
+    @Override
     public boolean deleteById(Integer ratingID) {
         return ratingRepository.deleteById(ratingID);
     }
@@ -43,4 +44,5 @@ public class RatingServiceImpl implements RatingService {
     public boolean deleteAll() {
         return ratingRepository.deleteAll();
     }
+
 }

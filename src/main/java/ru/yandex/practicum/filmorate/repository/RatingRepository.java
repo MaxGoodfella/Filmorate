@@ -8,13 +8,13 @@ public interface RatingRepository {
 
 // вроде все сделал
 
-    List<Rating> findAll();
-
-    Rating findRatingByID(Integer ratingID);
-
     Rating save(Rating newRating);
 
     void saveMany(List<Rating> newRatings);
+
+    List<Rating> findAll();
+
+    Rating findRatingByID(Integer ratingID);
 
     boolean deleteById(Integer ratingID);
 
