@@ -59,14 +59,48 @@ public class FilmRepositoryImpl implements FilmRepository {
                 });
     }
 
+    @Override
+    public boolean update(Film film) {
+        String sqlQuery = "update FILMS set NAME = ?, DESCRIPTION = ?, RELEASE_DATE = ?, DURATION = ? " +
+                "where FILM_ID = ?";
+        
+        int rowsAffected = jdbcTemplate.update(sqlQuery
+                , film.getName()
+                , film.getDescription()
+                , film.getReleaseDate()
+                , film.getDuration()
+                , film.getId());
+
+        return rowsAffected > 0;
+    }
 
     @Override
     public Film findById(Integer id) {
-
         return jdbcTemplate.queryForObject(
                 "select * from FILMS where film_id = ?",
                 filmRowMapper(),
                 id);
+    }
+
+    @Override
+    public Film findByName(String filmName) {
+        Film film = jdbcTemplate.queryForObject(
+                "select * from FILMS where NAME = ?",
+                filmRowMapper(),
+                filmName);
+
+        return film;
+    }
+
+    @Override
+    public Integer findIdByName(String name) {
+        String sql = "SELECT film_id FROM films WHERE name = ?";
+        List<Integer> filmIds = jdbcTemplate.queryForList(sql, Integer.class, name);
+        if (!filmIds.isEmpty()) {
+            return filmIds.get(0);
+        } else {
+            return null;
+        }
     }
 
     @Override

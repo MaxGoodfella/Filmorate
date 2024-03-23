@@ -1,9 +1,7 @@
 package ru.yandex.practicum.filmorate.service;
 
-import org.springframework.web.bind.annotation.RequestBody;
 import ru.yandex.practicum.filmorate.model.User;
 
-import javax.validation.Valid;
 import java.util.List;
 
 public interface UserService {
@@ -12,7 +10,11 @@ public interface UserService {
 
     void saveMany(List<User> newUsers);
 
+    void update(User user);
+
     User findById(Integer id);
+
+    User findByName(String userName);
 
     List<User> findAll();
 

@@ -6,12 +6,9 @@ import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.Rating;
-import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
 import javax.validation.Valid;
-import javax.validation.constraints.Positive;
 import java.util.List;
 
 @RestController
@@ -39,11 +36,27 @@ public class FilmController {
     }
 
 
+    @PutMapping
+    public void update(@Valid @RequestBody Film film) {
+        log.info("Start updating film {}", film);
+        filmService.update(film);
+        log.info("Finish updating film {}", film);
+    }
+
+
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public Film findFilmByID(@PathVariable("id") Integer filmID) {
         log.info("Start fetching film with id = {}", filmID);
         Film fetchedFilm = filmService.findById(filmID);
         log.info("Finish fetching film with id = {}", fetchedFilm.getId());
+        return fetchedFilm;
+    }
+
+    @GetMapping(value = "/name/{name}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public Film findFilmByName(@PathVariable("name") String filmName) {
+        log.info("Start fetching film with name = {}", filmName);
+        Film fetchedFilm = filmService.findByName(filmName);
+        log.info("Finish fetching film with name = {}", filmName);
         return fetchedFilm;
     }
 

@@ -49,6 +49,13 @@ public class GenreRepositoryImpl implements GenreRepository {
                 });
     }
 
+    @Override
+    public boolean update(Genre genre) {
+        String sqlQuery = "UPDATE GENRES SET GENRE_NAME = ? WHERE GENRE_ID = ?";
+        int rowsAffected = jdbcTemplate.update(sqlQuery, genre.getName(), genre.getId());
+
+        return rowsAffected > 0;
+    }
 
     @Override
     public Genre findGenreByID(Integer genreID) {
@@ -61,13 +68,34 @@ public class GenreRepositoryImpl implements GenreRepository {
     }
 
     @Override
+    public Genre findByName(String genreName) {
+        Genre genre = jdbcTemplate.queryForObject(
+                "select * from GENRES where GENRE_NAME = ?",
+                genreRowMapper(),
+                genreName);
+
+        return genre;
+    }
+
+    @Override
+    public Integer findIdByName(String name) {
+        String sql = "SELECT genre_id FROM genres WHERE genre_name = ?";
+        List<Integer> genreIds = jdbcTemplate.queryForList(sql, Integer.class, name);
+        if (!genreIds.isEmpty()) {
+            return genreIds.get(0);
+        } else {
+            return null;
+        }
+    }
+
+
+    @Override
     public List<Genre> findAll() {
         return jdbcTemplate.query(
                 "select * from GENRES",
                 genreRowMapper());
 
     }
-
 
     @Override
     public boolean deleteById(Integer genreID) {

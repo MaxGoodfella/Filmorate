@@ -38,23 +38,6 @@ public class User {
 //
 //    private UserFriendship friendship;
 
-//    public User(@Email @NotEmpty String email, @NotBlank @Pattern(regexp = "\\S*") String login,
-//                @NotNull @PastOrPresent LocalDate birthday) {
-//        this.email = email;
-//        this.login = login;
-//        this.birthday = birthday;
-//    }
-//
-//    public User(Integer id, String name, @Email @NotEmpty String email, @NotBlank @Pattern(regexp = "\\S*") String login,
-//                @NotNull @PastOrPresent LocalDate birthday) {
-//        this.id = id;
-//        this.name = name;
-//        this.email = email;
-//        this.login = login;
-//        this.birthday = birthday;
-//    }
-
-
 
 
     public User setId(Integer id) {
@@ -62,11 +45,3 @@ public class User {
         return this;
     }
 }
-
-
-/*
-Select f.film_id, g.genre_id
-From films as f
-JOIN film_genre as fg ON f.film_id = fg.film_id
-JOIN genre as g ON fg.genre_id = g.genre_id
- */

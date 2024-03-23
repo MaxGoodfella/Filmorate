@@ -2,7 +2,9 @@ package ru.yandex.practicum.filmorate.service.impl;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.exceptions.EntityNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.repository.FilmRepository;
 import ru.yandex.practicum.filmorate.service.FilmService;
@@ -19,17 +21,57 @@ public class FilmServiceImpl implements FilmService {
 
     @Override
     public Film save(Film newFilm) {
-        return filmRepository.save(newFilm);
+        String filmName = newFilm.getName();
+        Integer existingFilmId = filmRepository.findIdByName(filmName);
+        if (existingFilmId != null) {
+            newFilm.setId(existingFilmId);
+            return newFilm;
+        } else {
+            return filmRepository.save(newFilm);
+        }
     }
 
     @Override
     public void saveMany(List<Film> newFilms) {
-        filmRepository.saveMany(newFilms);
+        for (Film newFilm : newFilms) {
+            Integer existingFilmId = filmRepository.findIdByName(newFilm.getName());
+            if (existingFilmId != null) {
+                newFilm.setId(existingFilmId);
+                update(newFilm);
+                System.out.println("Film '" + newFilm.getName() + "' has been updated.");
+            } else {
+                save(newFilm);
+                System.out.println("Film '" + newFilm.getName() + "' has been added.");
+            }
+        }
+    }
+
+    @Override
+    public void update(Film film) {
+        boolean isSuccess = filmRepository.update(film);
+
+        if (!isSuccess) {
+            throw new EntityNotFoundException(Film.class,
+                    "Film with id = " + film.getId() + " hasn't been found");
+        }
     }
 
     @Override
     public Film findById(Integer id) {
-        return filmRepository.findById(id);
+        try {
+            return filmRepository.findById(id);
+        } catch (EmptyResultDataAccessException ex) {
+            throw new EntityNotFoundException(Film.class, "Film with id = " + id + " hasn't been found");
+        }
+    }
+
+    @Override
+    public Film findByName(String filmName) {
+        try {
+            return filmRepository.findByName(filmName);
+        } catch (EmptyResultDataAccessException ex) {
+            throw new EntityNotFoundException(Film.class, "Film with name '" + filmName + "' hasn't been found");
+        }
     }
 
     @Override

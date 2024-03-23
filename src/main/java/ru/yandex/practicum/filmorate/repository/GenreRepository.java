@@ -10,9 +10,15 @@ public interface GenreRepository {
 
     void saveMany(List<Genre> newGenres);
 
-    List<Genre> findAll();
+    boolean update(Genre genre);
 
     Genre findGenreByID(Integer genreID);
+
+    Genre findByName(String genreName);
+
+    Integer findIdByName(String name);
+
+    List<Genre> findAll();
 
     boolean deleteById(Integer genreID);
 

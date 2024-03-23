@@ -5,11 +5,9 @@ import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Rating;
-import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.repository.RatingRepository;
 
 import java.sql.PreparedStatement;
@@ -52,6 +50,16 @@ public class RatingRepositoryImpl implements RatingRepository {
                 });
     }
 
+
+    @Override
+    public boolean update(Rating rating) {
+        String sqlQuery = "update FILM_RATING set RATING_NAME = ? where RATING_ID = ?";
+        int rowsAffected = jdbcTemplate.update(sqlQuery, rating.getName(), rating.getId());
+
+        return rowsAffected > 0;
+    }
+
+
     @Override
     public Rating findRatingByID(Integer ratingID) {
         Rating rating = jdbcTemplate.queryForObject(
@@ -60,6 +68,27 @@ public class RatingRepositoryImpl implements RatingRepository {
                 ratingID);
 
         return rating;
+    }
+
+    @Override
+    public Rating findByName(String ratingName) {
+        Rating rating = jdbcTemplate.queryForObject(
+                "select * from FILM_RATING where RATING_NAME = ?",
+                ratingRowMapper(),
+                ratingName);
+
+        return rating;
+    }
+
+    @Override
+    public Integer findIdByName(String name) {
+        String sql = "SELECT rating_id FROM FILM_RATING WHERE rating_name = ?";
+        List<Integer> ratingIds = jdbcTemplate.queryForList(sql, Integer.class, name);
+        if (!ratingIds.isEmpty()) {
+            return ratingIds.get(0);
+        } else {
+            return null;
+        }
     }
 
     @Override

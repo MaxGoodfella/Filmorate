@@ -2,7 +2,9 @@ package ru.yandex.practicum.filmorate.service.impl;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.exceptions.EntityNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.repository.UserRepository;
 import ru.yandex.practicum.filmorate.service.UserService;
@@ -19,17 +21,57 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User save(User newUser) {
-        return userRepository.save(newUser);
+        String userName = newUser.getName();
+        Integer existingUserId = userRepository.findIdByName(userName);
+        if (existingUserId != null) {
+            newUser.setId(existingUserId);
+            return newUser;
+        } else {
+            return userRepository.save(newUser);
+        }
     }
 
     @Override
     public void saveMany(List<User> newUsers) {
-        userRepository.saveMany(newUsers);
+        for (User newUser : newUsers) {
+            Integer existingUserId = userRepository.findIdByName(newUser.getName());
+            if (existingUserId != null) {
+                newUser.setId(existingUserId);
+                update(newUser);
+                System.out.println("User '" + newUser.getName() + "' has been updated.");
+            } else {
+                save(newUser);
+                System.out.println("User '" + newUser.getName() + "' has been added.");
+            }
+        }
+    }
+
+    @Override
+    public void update(User user) {
+        boolean isSuccess = userRepository.update(user);
+
+        if (!isSuccess) {
+            throw new EntityNotFoundException(User.class,
+                    "User with id = " + user.getId() + " hasn't been found");
+        }
     }
 
     @Override
     public User findById(Integer id) {
-        return userRepository.findById(id);
+        try {
+            return userRepository.findById(id);
+        } catch (EmptyResultDataAccessException ex) {
+            throw new EntityNotFoundException(User.class, "User with id = " + id + " hasn't been found");
+        }
+    }
+
+    @Override
+    public User findByName(String userName) {
+        try {
+            return userRepository.findByName(userName);
+        } catch (EmptyResultDataAccessException ex) {
+            throw new EntityNotFoundException(User.class, "User with name '" + userName + "' hasn't been found");
+        }
     }
 
     @Override

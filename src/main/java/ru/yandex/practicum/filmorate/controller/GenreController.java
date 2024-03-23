@@ -6,7 +6,6 @@ import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.model.Rating;
 import ru.yandex.practicum.filmorate.service.GenreService;
 
 import javax.validation.Valid;
@@ -32,16 +31,33 @@ public class GenreController {
 
     @PostMapping(value = "/multiple", produces = MediaType.APPLICATION_JSON_VALUE)
     public void saveMany(@Valid @RequestBody List<Genre> newGenres) {
-        log.info("Start saving all genres");
+        log.info("Start saving genres {}", newGenres);
         genreService.saveMany(newGenres);
-        log.info("Finish saving all genres");
+        log.info("Finish saving genres {}", newGenres);
+    }
+
+    @PutMapping
+    public void update(@Valid @RequestBody Genre genre) {
+        log.info("Start updating genre {}", genre);
+        genreService.update(genre);
+        log.info("Finish updating genre {}", genre);
     }
 
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public Genre findGenreByID(@PathVariable("id") Integer genreID) {
         log.info("Start fetching genre with id = {}", genreID);
         Genre fetchedGenre = genreService.findGenreByID(genreID);
+        String genreString = String.valueOf(fetchedGenre);
+        log.info("what's here: " + genreString);
         log.info("Finish fetching genre with id = {}", fetchedGenre.getId());
+        return fetchedGenre;
+    }
+
+    @GetMapping(value = "/name/{name}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public Genre findGenreByName(@PathVariable("name") String genreName) {
+        log.info("Start fetching genre with name = {}", genreName);
+        Genre fetchedGenre = genreService.findByName(genreName);
+        log.info("Finish fetching genre with name = {}", genreName);
         return fetchedGenre;
     }
 

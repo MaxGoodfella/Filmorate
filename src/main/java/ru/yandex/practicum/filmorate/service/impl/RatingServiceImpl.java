@@ -1,7 +1,9 @@
 package ru.yandex.practicum.filmorate.service.impl;
 
 import lombok.AllArgsConstructor;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.exceptions.EntityNotFoundException;
 import ru.yandex.practicum.filmorate.model.Rating;
 import ru.yandex.practicum.filmorate.repository.RatingRepository;
 import ru.yandex.practicum.filmorate.service.RatingService;
@@ -17,12 +19,39 @@ public class RatingServiceImpl implements RatingService {
 
     @Override
     public Rating save(Rating newRating) {
-        return ratingRepository.save(newRating);
+        String ratingName = newRating.getName();
+        Integer existingRatingId = ratingRepository.findIdByName(ratingName);
+        if (existingRatingId != null) {
+            newRating.setId(existingRatingId);
+            return newRating;
+        } else {
+            return ratingRepository.save(newRating);
+        }
     }
 
     @Override
     public void saveMany(List<Rating> newRatings) {
-        ratingRepository.saveMany(newRatings);
+        for (Rating newRating : newRatings) {
+            Integer existingRatingId = ratingRepository.findIdByName(newRating.getName());
+            if (existingRatingId != null) {
+                newRating.setId(existingRatingId);
+                update(newRating);
+                System.out.println("Rating '" + newRating.getName() + "' has been updated.");
+            } else {
+                save(newRating);
+                System.out.println("Rating '" + newRating.getName() + "' has been added.");
+            }
+        }
+    }
+
+    @Override
+    public void update(Rating rating) {
+        boolean isSuccess = ratingRepository.update(rating);
+
+        if (!isSuccess) {
+            throw new EntityNotFoundException(Rating.class,
+                    "Rating with id = " + rating.getId() + " hasn't been found");
+        }
     }
 
     @Override
@@ -32,7 +61,20 @@ public class RatingServiceImpl implements RatingService {
 
     @Override
     public Rating findRatingByID(Integer ratingID) {
-        return ratingRepository.findRatingByID(ratingID);
+        try {
+            return ratingRepository.findRatingByID(ratingID);
+        } catch (EmptyResultDataAccessException ex) {
+            throw new EntityNotFoundException(Rating.class, "Rating with id = " + ratingID + " hasn't been found");
+        }
+    }
+
+    @Override
+    public Rating findByName(String ratingName) {
+        try {
+            return ratingRepository.findByName(ratingName);
+        } catch (EmptyResultDataAccessException ex) {
+            throw new EntityNotFoundException(Rating.class, "Rating with name '" + ratingName + "' hasn't been found");
+        }
     }
 
     @Override

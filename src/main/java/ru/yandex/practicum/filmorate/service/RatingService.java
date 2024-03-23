@@ -11,8 +11,13 @@ public interface RatingService {
 
     void saveMany(List<Rating> newRatings);
 
+    void update(Rating rating);
+
     List<Rating> findAll();
+
     Rating findRatingByID(Integer ratingID);
+
+    Rating findByName(String ratingName);
 
     boolean deleteById(Integer ratingID);
 

@@ -1,7 +1,6 @@
 package ru.yandex.practicum.filmorate.service;
 
 import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.model.Rating;
 
 import java.util.List;
 
@@ -12,9 +11,13 @@ public interface GenreService {
 
     void saveMany(List<Genre> newGenres);
 
+    void update(Genre genre);
+
     List<Genre> findAll();
 
     Genre findGenreByID(Integer genreID);
+
+    Genre findByName(String genreName);
 
     boolean deleteById(Integer genreID);
 

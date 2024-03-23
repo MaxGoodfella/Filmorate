@@ -3,7 +3,6 @@ package ru.yandex.practicum.filmorate.repository;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface FilmRepository {
 
@@ -11,7 +10,13 @@ public interface FilmRepository {
 
     void saveMany(List<Film> newFilms);
 
+    boolean update(Film film);
+
     Film findById(Integer id);
+
+    Film findByName(String filmName);
+
+    Integer findIdByName(String name);
 
     List<Film> findAll();
 

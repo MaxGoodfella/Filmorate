@@ -1,10 +1,8 @@
 package ru.yandex.practicum.filmorate.service;
 
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.List;
-import java.util.Set;
 
 public interface FilmService {
 
@@ -12,7 +10,11 @@ public interface FilmService {
 
     void saveMany(List<Film> newFilms);
 
+    void update(Film film);
+
     Film findById(Integer id);
+
+    Film findByName(String filmName);
 
     List<Film> findAll();
 

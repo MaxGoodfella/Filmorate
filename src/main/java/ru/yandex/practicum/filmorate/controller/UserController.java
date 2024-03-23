@@ -34,11 +34,26 @@ public class UserController {
         log.info("Finish saving users {}", newUsers);
     }
 
+    @PutMapping
+    public void update(@Valid @RequestBody User user) {
+        log.info("Start updating user {}", user);
+        userService.update(user);
+        log.info("Finish updating user {}", user);
+    }
+
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public User findByID(@PathVariable("id") Integer userID) {
         log.info("Start fetching user with id = {}", userID);
         User fetchedUser = userService.findById(userID);
         log.info("Finish fetching user with id = {}", fetchedUser.getId());
+        return fetchedUser;
+    }
+
+    @GetMapping(value = "/name/{name}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public User findUserByName(@PathVariable("name") String userName) {
+        log.info("Start fetching user with name = {}", userName);
+        User fetchedUser = userService.findByName(userName);
+        log.info("Finish fetching user with name = {}", userName);
         return fetchedUser;
     }
 

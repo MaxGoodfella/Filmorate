@@ -60,6 +60,21 @@ public class UserRepositoryImpl implements UserRepository {
                 });
     }
 
+    @Override
+    public boolean update(User user) {
+        String sqlQuery = "update USERS set NAME = ?, EMAIL = ?, LOGIN = ?, DATE_OF_BIRTH = ? " +
+                "where USER_ID = ?";
+
+        int rowsAffected = jdbcTemplate.update(sqlQuery
+                , user.getName()
+                , user.getEmail()
+                , user.getLogin()
+                , user.getBirthday()
+                , user.getId());
+
+        return rowsAffected > 0;
+    }
+
 
     @Override
     public User findById(Integer id) {
@@ -67,6 +82,27 @@ public class UserRepositoryImpl implements UserRepository {
                 "select * from USERS where user_id = ?",
                 userRowMapper(),
                 id);
+    }
+
+    @Override
+    public User findByName(String userName) {
+        User user = jdbcTemplate.queryForObject(
+                "select * from USERS where NAME = ?",
+                userRowMapper(),
+                userName);
+
+        return user;
+    }
+    
+    @Override
+    public Integer findIdByName(String name) {
+        String sql = "SELECT user_id FROM USERS WHERE name = ?";
+        List<Integer> userIds = jdbcTemplate.queryForList(sql, Integer.class, name);
+        if (!userIds.isEmpty()) {
+            return userIds.get(0);
+        } else {
+            return null;
+        }
     }
 
     @Override

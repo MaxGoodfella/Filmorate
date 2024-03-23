@@ -6,15 +6,19 @@ import java.util.List;
 
 public interface RatingRepository {
 
-// вроде все сделал
-
     Rating save(Rating newRating);
 
     void saveMany(List<Rating> newRatings);
 
+    boolean update(Rating rating);
+
     List<Rating> findAll();
 
     Rating findRatingByID(Integer ratingID);
+
+    Rating findByName(String ratingName);
+
+    Integer findIdByName(String name);
 
     boolean deleteById(Integer ratingID);
 

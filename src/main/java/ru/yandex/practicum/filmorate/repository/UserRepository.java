@@ -10,7 +10,13 @@ public interface UserRepository {
 
     void saveMany(List<User> newUsers);
 
+    boolean update(User user);
+
     User findById(Integer id);
+
+    User findByName(String userName);
+
+    Integer findIdByName(String name);
 
     List<User> findAll();
 
