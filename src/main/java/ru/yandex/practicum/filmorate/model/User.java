@@ -3,12 +3,9 @@ package ru.yandex.practicum.filmorate.model;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Singular;
 
 import javax.validation.constraints.*;
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Set;
 
 
 @Data
@@ -32,16 +29,16 @@ public class User {
     @PastOrPresent
     private LocalDate birthday;
 
-    // нижние пока закомментил
-//    @Singular
-//    private final Set<Integer> friends = new HashSet<>();
-//
-//    private UserFriendship friendship;
 
-
+    public User(String email, String login, LocalDate birthday) {
+        this.email = email;
+        this.login = login;
+        this.birthday = birthday;
+    }
 
     public User setId(Integer id) {
         this.id = id;
         return this;
     }
+
 }

@@ -22,4 +22,5 @@ public interface RatingService {
     boolean deleteById(Integer ratingID);
 
     boolean deleteAll();
+
 }

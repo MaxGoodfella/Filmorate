@@ -16,6 +16,10 @@ public interface UserRepository {
 
     User findByName(String userName);
 
+    User findByEmail(String email);
+
+    User findByLogin(String login);
+
     Integer findIdByName(String name);
 
     List<User> findAll();
@@ -24,8 +28,12 @@ public interface UserRepository {
 
     boolean deleteAll();
 
-    // update
+    void addFriend(Integer userId, Integer friendId);
 
-// add friend to user
-    // remove friend from user
+    boolean removeFriend(Integer userId, Integer friendId);
+
+    List<Integer> findUsersFriendsIds(Integer userId);
+
+    List<Integer> getCommonFriends(Integer user1ID, Integer user2ID);
+
 }

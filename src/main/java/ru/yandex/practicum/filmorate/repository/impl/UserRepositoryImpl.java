@@ -60,6 +60,7 @@ public class UserRepositoryImpl implements UserRepository {
                 });
     }
 
+
     @Override
     public boolean update(User user) {
         String sqlQuery = "update USERS set NAME = ?, EMAIL = ?, LOGIN = ?, DATE_OF_BIRTH = ? " +
@@ -78,26 +79,59 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Override
     public User findById(Integer id) {
-        return jdbcTemplate.queryForObject(
+        List<User> users = jdbcTemplate.query(
                 "select * from USERS where user_id = ?",
                 userRowMapper(),
                 id);
+
+        if (users.isEmpty()) {
+            return null;
+        } else {
+            return users.get(0);
+        }
     }
 
     @Override
     public User findByName(String userName) {
-        User user = jdbcTemplate.queryForObject(
+        return jdbcTemplate.queryForObject(
                 "select * from USERS where NAME = ?",
                 userRowMapper(),
                 userName);
-
-        return user;
     }
-    
+
+    @Override
+    public User findByEmail(String email) {
+        List<User> users = jdbcTemplate.query(
+                "select * from USERS where EMAIL = ?",
+                userRowMapper(),
+                email);
+
+        if (users.isEmpty()) {
+            return null;
+        } else {
+            return users.get(0);
+        }
+    }
+
+    @Override
+    public User findByLogin(String login) {
+        List<User> users = jdbcTemplate.query(
+                "select * from USERS where LOGIN = ?",
+                userRowMapper(),
+                login);
+
+        if (users.isEmpty()) {
+            return null;
+        } else {
+            return users.get(0);
+        }
+    }
+
     @Override
     public Integer findIdByName(String name) {
         String sql = "SELECT user_id FROM USERS WHERE name = ?";
         List<Integer> userIds = jdbcTemplate.queryForList(sql, Integer.class, name);
+
         if (!userIds.isEmpty()) {
             return userIds.get(0);
         } else {
@@ -128,6 +162,46 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
 
+    @Override
+    public void addFriend(Integer userId, Integer friendId) {
+        String sqlQuery = "INSERT INTO USER_FRIENDSHIP(USER_ID, FRIEND_ID) VALUES (?, ?)";
+
+        jdbcTemplate.update(sqlQuery,
+                userId,
+                friendId);
+
+        jdbcTemplate.update(sqlQuery,
+                friendId,
+                userId);
+    }
+
+    @Override
+    public boolean removeFriend(Integer userId, Integer friendId) {
+        String sqlQuery = "DELETE FROM USER_FRIENDSHIP " +
+                "WHERE (user_id = ? AND friend_id = ?) OR (user_id = ? AND friend_id = ?)";
+        int rowsDeleted = jdbcTemplate.update(sqlQuery, userId, friendId, friendId, userId);
+        return rowsDeleted > 0;
+    }
+
+    @Override
+    public List<Integer> findUsersFriendsIds(Integer userId) {
+        String sqlQuery = "SELECT friend_id FROM USER_FRIENDSHIP WHERE user_id = ? ORDER BY friend_id";
+
+        return jdbcTemplate.queryForList(sqlQuery, Integer.class, userId);
+    }
+
+    @Override
+    public List<Integer> getCommonFriends(Integer user1ID, Integer user2ID) {
+        String sqlQuery = "SELECT uf1.friend_id " +
+                          "FROM USER_FRIENDSHIP uf1 " +
+                          "INNER JOIN USER_FRIENDSHIP uf2 ON uf1.friend_id = uf2.friend_id " +
+                          "WHERE uf1.user_id = ? AND uf2.user_id = ?" +
+                          "ORDER BY uf1.friend_id";
+
+        return jdbcTemplate.queryForList(sqlQuery, Integer.class, user1ID, user2ID);
+    }
+
+
     private static RowMapper<User> userRowMapper() {
         return (rs, rowNum) -> new User(
                 rs.getInt("user_id"),
@@ -135,7 +209,6 @@ public class UserRepositoryImpl implements UserRepository {
                 rs.getString("email"),
                 rs.getString("login"),
                 rs.getDate("date_of_birth").toLocalDate());
-
     }
 
     private Map<String, Object> userToMap(User user) {

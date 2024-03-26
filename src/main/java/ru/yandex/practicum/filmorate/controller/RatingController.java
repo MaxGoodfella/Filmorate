@@ -35,7 +35,6 @@ public class RatingController {
         log.info("Finish saving ratings {}", newRatings);
     }
 
-
     @PutMapping
     public void update(@Valid @RequestBody Rating rating) {
         log.info("Start updating rating {}", rating);
@@ -66,7 +65,6 @@ public class RatingController {
         log.info("Finish fetching all ratings");
         return fetchedRatings;
     }
-
 
     @DeleteMapping(value = "/{id}")
     public boolean deleteById(@PathVariable("id") Integer ratingID) {

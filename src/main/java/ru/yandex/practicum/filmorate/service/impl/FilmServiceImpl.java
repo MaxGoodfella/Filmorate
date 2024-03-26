@@ -19,6 +19,8 @@ public class FilmServiceImpl implements FilmService {
     private FilmRepository filmRepository;
 
 
+    // вероятно понадобится валидация фильма прямо по всем полям
+
     @Override
     public Film save(Film newFilm) {
         String filmName = newFilm.getName();

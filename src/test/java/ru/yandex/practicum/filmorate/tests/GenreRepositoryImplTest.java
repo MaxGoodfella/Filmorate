@@ -16,8 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.*;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 @JdbcTest
@@ -33,10 +32,10 @@ public class GenreRepositoryImplTest {
         genreRepositoryImpl = new GenreRepositoryImpl(jdbcTemplate);
     }
 
-//    @AfterEach
-//    public void tearDown() {
-//        jdbcTemplate.execute("DELETE FROM GENRES");
-//    }
+    @AfterEach
+    public void tearDown() {
+        jdbcTemplate.execute("DELETE FROM GENRES");
+    }
 
 
     @Test
@@ -58,6 +57,48 @@ public class GenreRepositoryImplTest {
         genreRepositoryImpl.save(newGenre);
 
         assertThrows(EmptyResultDataAccessException.class, () -> genreRepositoryImpl.findGenreByID(2));
+    }
+
+    @Test
+    public void testFindGenreByExistingName() {
+        Genre newGenre = new Genre(1, "Comedy");
+        Genre savedGenre = genreRepositoryImpl.save(newGenre);
+
+        assertDoesNotThrow(() -> genreRepositoryImpl.findByName(savedGenre.getName()));
+
+        assertThat(savedGenre)
+                .isNotNull()
+                .usingRecursiveComparison()
+                .isEqualTo(newGenre);
+    }
+
+    @Test
+    public void testFindGenreByNotExistingName_shouldReturnNull() {
+        Genre newGenre = new Genre(1, "Comedy");
+        genreRepositoryImpl.save(newGenre);
+
+        assertNull(genreRepositoryImpl.findByName("Drama"));
+    }
+
+    @Test
+    public void testFindGenreIdByExistingName() {
+        Genre newGenre = new Genre(1, "Comedy");
+        Genre savedGenre = genreRepositoryImpl.save(newGenre);
+
+        assertDoesNotThrow(() -> genreRepositoryImpl.findIdByName(savedGenre.getName()));
+
+        assertThat(savedGenre)
+                .isNotNull()
+                .usingRecursiveComparison()
+                .isEqualTo(newGenre);
+    }
+
+    @Test
+    public void testFindGenreIdByNotExistingName_shouldReturnNull() {
+        Genre newGenre = new Genre(1, "Comedy");
+        genreRepositoryImpl.save(newGenre);
+
+        assertNull(genreRepositoryImpl.findIdByName("Drama"));
     }
 
     @Test
@@ -131,7 +172,7 @@ public class GenreRepositoryImplTest {
     }
 
     @Test
-    public void testDeleteByNotExistingId_shouldThrowEmptyResultDataAccessException() {
+    public void testDeleteByNotExistingId() {
         Genre newGenre = new Genre(1, "Comedy");
         genreRepositoryImpl.save(newGenre);
 

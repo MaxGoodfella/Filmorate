@@ -6,7 +6,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
-import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Rating;
 import ru.yandex.practicum.filmorate.repository.RatingRepository;
 
@@ -62,28 +61,32 @@ public class RatingRepositoryImpl implements RatingRepository {
 
     @Override
     public Rating findRatingByID(Integer ratingID) {
-        Rating rating = jdbcTemplate.queryForObject(
+        return jdbcTemplate.queryForObject(
                 "select * from FILM_RATING where rating_id = ?",
                 ratingRowMapper(),
                 ratingID);
-
-        return rating;
     }
 
     @Override
     public Rating findByName(String ratingName) {
-        Rating rating = jdbcTemplate.queryForObject(
-                "select * from FILM_RATING where RATING_NAME = ?",
+        List<Rating> ratings = jdbcTemplate.query(
+                "SELECT * FROM FILM_RATING WHERE RATING_NAME = ?",
                 ratingRowMapper(),
-                ratingName);
+                ratingName
+        );
 
-        return rating;
+        if (ratings.isEmpty()) {
+            return null;
+        } else {
+            return ratings.get(0);
+        }
     }
 
     @Override
     public Integer findIdByName(String name) {
         String sql = "SELECT rating_id FROM FILM_RATING WHERE rating_name = ?";
         List<Integer> ratingIds = jdbcTemplate.queryForList(sql, Integer.class, name);
+
         if (!ratingIds.isEmpty()) {
             return ratingIds.get(0);
         } else {

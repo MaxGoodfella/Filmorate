@@ -1,17 +1,18 @@
 package ru.yandex.practicum.filmorate.service.impl;
 
 import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.exceptions.EntityAlreadyExistsException;
 import ru.yandex.practicum.filmorate.exceptions.EntityNotFoundException;
 import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.repository.GenreRepository;
 import ru.yandex.practicum.filmorate.service.GenreService;
 
+import java.util.ArrayList;
 import java.util.List;
 
-@Slf4j
 @AllArgsConstructor
 @Service
 public class GenreServiceImpl implements GenreService {
@@ -21,28 +22,33 @@ public class GenreServiceImpl implements GenreService {
 
     @Override
     public Genre save(Genre genre) {
-        String genreName = genre.getName();
-        Integer existingGenreId = genreRepository.findIdByName(genreName);
-        if (existingGenreId != null) {
-            genre.setId(existingGenreId);
-            return genre;
-        } else {
-            return genreRepository.save(genre);
+        Genre existingGenre = genreRepository.findByName(genre.getName());
+
+        if (existingGenre != null) {
+            throw new EntityAlreadyExistsException(User.class,
+                    "Genre with name '" + genre.getName() + "' already exists");
         }
+
+        return genreRepository.save(genre);
     }
 
     @Override
     public void saveMany(List<Genre> newGenres) {
+        List<Genre> existingGenres = new ArrayList<>();
+        List<Genre> newGenresToSave = new ArrayList<>();
+
         for (Genre newGenre : newGenres) {
             Integer existingGenreId = genreRepository.findIdByName(newGenre.getName());
             if (existingGenreId != null) {
                 newGenre.setId(existingGenreId);
-                update(newGenre);
-                System.out.println("Genre '" + newGenre.getName() + "' has been updated.");
+                existingGenres.add(newGenre);
             } else {
-                save(newGenre);
-                System.out.println("Genre '" + newGenre.getName() + "' has been added.");
+                newGenresToSave.add(newGenre);
             }
+        }
+
+        if (!newGenresToSave.isEmpty()) {
+            genreRepository.saveMany(newGenresToSave);
         }
     }
 
@@ -72,11 +78,11 @@ public class GenreServiceImpl implements GenreService {
 
     @Override
     public Genre findByName(String genreName) {
-        try {
-            return genreRepository.findByName(genreName);
-        } catch (EmptyResultDataAccessException ex) {
+        if (genreRepository.findByName(genreName) == null) {
             throw new EntityNotFoundException(Genre.class, "Genre with name '" + genreName + "' hasn't been found");
         }
+
+        return genreRepository.findByName(genreName);
     }
 
     @Override

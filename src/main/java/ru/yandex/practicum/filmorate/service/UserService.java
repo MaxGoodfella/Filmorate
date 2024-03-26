@@ -22,23 +22,12 @@ public interface UserService {
 
     boolean deleteAll();
 
+    void addFriend(Integer userId, Integer friendId);
 
+    List<Integer> findUsersFriendsIds(Integer userId);
 
+    boolean removeFriend(Integer userId, Integer friendId);
 
-//    User create(User user);
-//
-//    User put(User updatedUser);
-//
-//    List<User> findAll();
-//
-//    User addFriend(Integer userId, Integer friendId);
-//
-//    User removeFriend(Integer userId, Integer friendId);
-//
-//    List<User> getAllFriends(Integer userID);
-//
-//    List<User> getMutualFriends(Integer user1ID, Integer user2ID);
-//
-//    User findUserByID(Integer userID);
+    List<Integer> getCommonFriends(Integer user1ID, Integer user2ID);
 
 }

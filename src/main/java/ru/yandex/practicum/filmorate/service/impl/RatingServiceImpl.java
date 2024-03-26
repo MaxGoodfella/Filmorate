@@ -3,11 +3,14 @@ package ru.yandex.practicum.filmorate.service.impl;
 import lombok.AllArgsConstructor;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.exceptions.EntityAlreadyExistsException;
 import ru.yandex.practicum.filmorate.exceptions.EntityNotFoundException;
 import ru.yandex.practicum.filmorate.model.Rating;
+import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.repository.RatingRepository;
 import ru.yandex.practicum.filmorate.service.RatingService;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @AllArgsConstructor
@@ -18,29 +21,34 @@ public class RatingServiceImpl implements RatingService {
 
 
     @Override
-    public Rating save(Rating newRating) {
-        String ratingName = newRating.getName();
-        Integer existingRatingId = ratingRepository.findIdByName(ratingName);
-        if (existingRatingId != null) {
-            newRating.setId(existingRatingId);
-            return newRating;
-        } else {
-            return ratingRepository.save(newRating);
+    public Rating save(Rating rating) {
+        Rating existingRating = ratingRepository.findByName(rating.getName());
+
+        if (existingRating != null) {
+            throw new EntityAlreadyExistsException(User.class,
+                    "Rating with name '" + rating.getName() + "' already exists");
         }
+
+        return ratingRepository.save(rating);
     }
 
     @Override
     public void saveMany(List<Rating> newRatings) {
+        List<Rating> existingRatings = new ArrayList<>();
+        List<Rating> newRatingsToSave = new ArrayList<>();
+
         for (Rating newRating : newRatings) {
             Integer existingRatingId = ratingRepository.findIdByName(newRating.getName());
             if (existingRatingId != null) {
                 newRating.setId(existingRatingId);
-                update(newRating);
-                System.out.println("Rating '" + newRating.getName() + "' has been updated.");
+                existingRatings.add(newRating);
             } else {
-                save(newRating);
-                System.out.println("Rating '" + newRating.getName() + "' has been added.");
+                newRatingsToSave.add(newRating);
             }
+        }
+
+        if (!newRatingsToSave.isEmpty()) {
+            ratingRepository.saveMany(newRatingsToSave);
         }
     }
 
@@ -70,11 +78,11 @@ public class RatingServiceImpl implements RatingService {
 
     @Override
     public Rating findByName(String ratingName) {
-        try {
-            return ratingRepository.findByName(ratingName);
-        } catch (EmptyResultDataAccessException ex) {
+        if (ratingRepository.findByName(ratingName) == null) {
             throw new EntityNotFoundException(Rating.class, "Rating with name '" + ratingName + "' hasn't been found");
         }
+
+        return ratingRepository.findByName(ratingName);
     }
 
     @Override

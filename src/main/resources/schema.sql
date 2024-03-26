@@ -1,4 +1,4 @@
---DROP TABLE FILM_GENRE, GENRES, FILM_RATING, FILM_FANS, USERS, USER_FRIENDSHIP, FRIENDSHIP_STATUSES, FILMS;
+--DROP TABLE FILM_GENRE, GENRES, FILM_RATING, FILM_FANS, USERS, USER_FRIENDSHIP, FILMS;
 
 create table IF NOT EXISTS FILMS
 (
@@ -32,9 +32,9 @@ create table IF NOT EXISTS FILM_FANS
     FILM_ID INTEGER not null,
     USER_ID INTEGER not null,
     constraint FILM_FANS_FILMS_FK
-        foreign key (FILM_ID) references FILMS,
+        foreign key (FILM_ID) references FILMS ON DELETE CASCADE,
     constraint FILM_FANS_USERS_FK
-        foreign key (USER_ID) references USERS
+        foreign key (USER_ID) references USERS ON DELETE CASCADE
 );
 
 create table IF NOT EXISTS GENRES
@@ -50,9 +50,9 @@ create table IF NOT EXISTS FILM_GENRE
     FILM_ID  INTEGER not null,
     GENRE_ID INTEGER not null,
     constraint FILM_GENRE_FILMS_FK
-        foreign key (FILM_ID) references FILMS,
+        foreign key (FILM_ID) references FILMS ON DELETE CASCADE,
     constraint FILM_GENRE_GENRE_FK
-        foreign key (GENRE_ID) references GENRES
+        foreign key (GENRE_ID) references GENRES ON DELETE CASCADE
 );
 
 create table IF NOT EXISTS FILM_RATING
@@ -63,24 +63,13 @@ create table IF NOT EXISTS FILM_RATING
         primary key (RATING_ID)
 );
 
-create table IF NOT EXISTS FRIENDSHIP_STATUSES
-(
-    STATUS_ID   INTEGER auto_increment,
-    STATUS_NAME CHARACTER VARYING not null,
-    constraint FRIENDSHIP_STATUSES_PK
-        primary key (STATUS_ID)
-);
-
 create table IF NOT EXISTS USER_FRIENDSHIP
 (
     USER_ID           INTEGER not null,
     FRIEND_ID         INTEGER not null,
-    FRIENDSHIP_STATUS INTEGER not null,
-    constraint USER_FRIENDSHIP_FRIENDSHIP_STATUSES_FK
-        foreign key (FRIENDSHIP_STATUS) references FRIENDSHIP_STATUSES,
     constraint USER_FRIENDSHIP_USERS_FK
-        foreign key (USER_ID) references USERS,
+        foreign key (USER_ID) references USERS ON DELETE CASCADE,
     constraint USER_FRIENDSHIP_USERS_FK_1
-        foreign key (FRIEND_ID) references USERS
+        foreign key (FRIEND_ID) references USERS ON DELETE CASCADE
 );
 
