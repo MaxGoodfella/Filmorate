@@ -20,4 +20,5 @@ public class Genre {
         this.id = id;
         return this;
     }
+
 }

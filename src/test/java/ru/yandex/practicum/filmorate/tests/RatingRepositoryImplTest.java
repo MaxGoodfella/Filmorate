@@ -43,7 +43,7 @@ public class RatingRepositoryImplTest {
         Rating newRating = new Rating(1, "PG13");
         Rating savedRating = ratingRepositoryImpl.save(newRating);
 
-        assertDoesNotThrow(() -> ratingRepositoryImpl.findRatingByID(savedRating.getId()));
+        assertDoesNotThrow(() -> ratingRepositoryImpl.findByID(savedRating.getId()));
 
         assertThat(savedRating)
                 .isNotNull()
@@ -56,7 +56,7 @@ public class RatingRepositoryImplTest {
         Rating newRating = new Rating(1, "PG13");
         ratingRepositoryImpl.save(newRating);
 
-        assertThrows(EmptyResultDataAccessException.class, () -> ratingRepositoryImpl.findRatingByID(2));
+        assertThrows(EmptyResultDataAccessException.class, () -> ratingRepositoryImpl.findByID(2));
     }
 
     @Test
@@ -170,7 +170,7 @@ public class RatingRepositoryImplTest {
         Rating savedRating = ratingRepositoryImpl.save(newRating);
 
         assertDoesNotThrow(() -> ratingRepositoryImpl.deleteById(savedRating.getId()));
-        assertThrows(EmptyResultDataAccessException.class, () -> ratingRepositoryImpl.findRatingByID(1));
+        assertThrows(EmptyResultDataAccessException.class, () -> ratingRepositoryImpl.findByID(1));
     }
 
     @Test

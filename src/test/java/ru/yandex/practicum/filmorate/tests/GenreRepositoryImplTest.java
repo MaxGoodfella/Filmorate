@@ -43,7 +43,7 @@ public class GenreRepositoryImplTest {
         Genre newGenre = new Genre(1, "Comedy");
         Genre savedGenre = genreRepositoryImpl.save(newGenre);
 
-        assertDoesNotThrow(() -> genreRepositoryImpl.findGenreByID(savedGenre.getId()));
+        assertDoesNotThrow(() -> genreRepositoryImpl.findByID(savedGenre.getId()));
 
         assertThat(savedGenre)
                 .isNotNull()
@@ -56,7 +56,7 @@ public class GenreRepositoryImplTest {
         Genre newGenre = new Genre(1, "Comedy");
         genreRepositoryImpl.save(newGenre);
 
-        assertThrows(EmptyResultDataAccessException.class, () -> genreRepositoryImpl.findGenreByID(2));
+        assertThrows(EmptyResultDataAccessException.class, () -> genreRepositoryImpl.findByID(2));
     }
 
     @Test
@@ -168,7 +168,7 @@ public class GenreRepositoryImplTest {
         Genre savedGenre = genreRepositoryImpl.save(newGenre);
 
         assertDoesNotThrow(() -> genreRepositoryImpl.deleteById(savedGenre.getId()));
-        assertThrows(EmptyResultDataAccessException.class, () -> genreRepositoryImpl.findGenreByID(1));
+        assertThrows(EmptyResultDataAccessException.class, () -> genreRepositoryImpl.findByID(1));
     }
 
     @Test

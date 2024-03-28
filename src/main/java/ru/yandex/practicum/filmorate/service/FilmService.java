@@ -22,17 +22,16 @@ public interface FilmService {
 
     boolean deleteAll();
 
+    void addLike(Integer filmId, Integer userId);
 
+    boolean removeLike(Integer filmId, Integer userId);
 
+    List<Film> getTopByLikes(Integer count);
 
+    void addGenres(Integer filmId, List<Integer> genreIds);
 
-//
-//    Film addLike(Integer filmId, Integer userId);
-//
-//    Film removeLike(Integer filmId, Integer userId);
-//
-//    List<Film> getTopByLikes(Integer count);
-//
-//    Set<User> getAllLikes(Integer filmID);
+    boolean removeGenre(Integer filmId, String genreName);
+
+    List<String> findGenresNames(Integer filmId);
 
 }

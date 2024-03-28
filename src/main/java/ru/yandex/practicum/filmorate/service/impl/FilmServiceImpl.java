@@ -4,11 +4,13 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.exceptions.EntityAlreadyExistsException;
 import ru.yandex.practicum.filmorate.exceptions.EntityNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.repository.FilmRepository;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -19,33 +21,42 @@ public class FilmServiceImpl implements FilmService {
     private FilmRepository filmRepository;
 
 
-    // вероятно понадобится валидация фильма прямо по всем полям
-
     @Override
     public Film save(Film newFilm) {
-        String filmName = newFilm.getName();
-        Integer existingFilmId = filmRepository.findIdByName(filmName);
-        if (existingFilmId != null) {
-            newFilm.setId(existingFilmId);
-            return newFilm;
-        } else {
-            return filmRepository.save(newFilm);
+        Film existingFilm = filmRepository.findByNameDescriptionReleaseDateAndDuration(
+                newFilm.getName(), newFilm.getDescription(), newFilm.getReleaseDate(), newFilm.getDuration());
+
+        if (existingFilm != null) {
+            throw new EntityAlreadyExistsException(Film.class, "Фильм с такими параметрами уже существует");
         }
+
+        return filmRepository.save(newFilm);
     }
 
     @Override
     public void saveMany(List<Film> newFilms) {
+
+        List<Film> existingFilms = new ArrayList<>();
+        List<Film> newFilmsToSave = new ArrayList<>();
+
+
         for (Film newFilm : newFilms) {
-            Integer existingFilmId = filmRepository.findIdByName(newFilm.getName());
-            if (existingFilmId != null) {
-                newFilm.setId(existingFilmId);
-                update(newFilm);
-                System.out.println("Film '" + newFilm.getName() + "' has been updated.");
+
+            Film existingFilm = filmRepository.findByNameDescriptionReleaseDateAndDuration(
+                    newFilm.getName(), newFilm.getDescription(), newFilm.getReleaseDate(), newFilm.getDuration());
+
+            if (existingFilm != null) {
+                existingFilms.add(existingFilm);
             } else {
-                save(newFilm);
-                System.out.println("Film '" + newFilm.getName() + "' has been added.");
+                newFilmsToSave.add(newFilm);
             }
+
         }
+
+        if (!newFilmsToSave.isEmpty()) {
+            filmRepository.saveMany(newFilmsToSave);
+        }
+
     }
 
     @Override
@@ -91,62 +102,96 @@ public class FilmServiceImpl implements FilmService {
         return filmRepository.deleteAll();
     }
 
+    @Override
+    public void addLike(Integer filmId, Integer userId) {
+
+        Film film = filmRepository.findById(filmId);
+
+        if (film == null) {
+            throw new EntityNotFoundException(Film.class, "Film with id = " + filmId + " hasn't been found");
+        }
+
+        if (filmRepository.existsLike(filmId, userId)) {
+            throw new EntityAlreadyExistsException(Integer.class,
+                    "User with id = " + userId + " has already liked film with id = '" + filmId + "'");
+        }
+
+        filmRepository.addLike(filmId, userId);
+
+    }
+
+    @Override
+    public boolean removeLike(Integer filmId, Integer userId) {
+
+        Film film = filmRepository.findById(filmId);
+
+        if (film == null) {
+            throw new EntityNotFoundException(Film.class, "Film with id = " + filmId + " hasn't been found");
+        }
+
+        if (!filmRepository.existsLike(filmId, userId)) {
+            throw new EntityNotFoundException(Integer.class,
+                    "User with id = " + userId + " hasn't liked film with id = '" + filmId + "' yet");
+        }
+
+        return filmRepository.removeLike(filmId, userId);
+
+    } // плохие сообщения выдает, но хотя бы нужный код ответа
 
 
+    @Override
+    public List<Film> getTopByLikes(Integer count) {
+        return filmRepository.getTopByLikes(count);
+    }
 
+    @Override
+    public void addGenres(Integer filmId, List<Integer> genreIds) {
 
+        Film film = filmRepository.findById(filmId);
 
+        if (film == null) {
+            throw new EntityNotFoundException(Film.class, "Film with id = " + filmId + " hasn't been found");
+        }
 
-//    private FilmStorage filmStorage;
-//    private UserStorage userStorage;
-//
-//    @Override
-//    public Film create(Film film) {
-//        return filmStorage.create(film);
-//    }
-//
-//    @Override
-//    public Film put(Film updatedFilm) {
-//        return filmStorage.put(updatedFilm);
-//    }
-//
-//    @Override
-//    public List<Film> findAll() {
-//        return filmStorage.findAll();
-//    }
-//
-//    @Override
-//    public Film addLike(Integer filmId, Integer userId) {
-//        userStorage.findUserByID(userId);
-//        return filmStorage.addLike(filmId, userId);
-//    }
-//
-//    @Override
-//    public Film removeLike(Integer filmId, Integer userId) {
-//        userStorage.findUserByID(userId);
-//        return filmStorage.removeLike(filmId, userId);
-//    }
-//
-//    @Override
-//    public List<Film> getTopByLikes(Integer count) {
-//        return filmStorage.getTopByLikes(count);
-//    }
-//
-//    @Override
-//    public Film findFilmByID(Integer filmID) {
-//        return filmStorage.findFilmByID(filmID);
-//    }
-//
-//    @Override
-//    public Set<User> getAllLikes(Integer filmID) {
-//        Set<Integer> fansIds = filmStorage.getAllLikes(filmID);
-//        Set<User> filmFans = new HashSet<>();
-//
-//        for (Integer userId : fansIds) {
-//            User user = userStorage.findUserByID(userId);
-//            filmFans.add(user);
-//        }
-//        return filmFans;
-//    }
+        for (Integer genreId : genreIds) {
+            if (filmRepository.existsLike(filmId, genreId)) {
+                throw new EntityAlreadyExistsException(Integer.class,
+                        "Film with id = " + filmId + " already has genre with id = " + genreId);
+            }
+        }
+
+        filmRepository.addGenres(filmId, genreIds);
+
+    }
+
+    @Override
+    public boolean removeGenre(Integer filmId, String genreName) {
+
+        Film film = filmRepository.findById(filmId);
+
+        if (film == null) {
+            throw new EntityNotFoundException(Film.class, "Film with id = " + filmId + " hasn't been found");
+        }
+
+        if (!filmRepository.findGenresNames(filmId).contains(genreName)) {
+            throw new EntityNotFoundException(String.class,
+                        "Film with id = " + filmId + " hasn't got genre with name = " + genreName + "' yet");
+        }
+
+        return filmRepository.removeGenre(filmId, genreName);
+
+    }
+
+    @Override
+    public List<String> findGenresNames(Integer filmId) {
+
+        Film film = filmRepository.findById(filmId);
+
+        if (film == null) {
+            throw new EntityNotFoundException(Film.class, "Film with id = " + filmId + " hasn't been found");
+        }
+
+        return filmRepository.findGenresNames(filmId);
+    }
 
 }

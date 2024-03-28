@@ -9,6 +9,7 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Positive;
 import java.util.List;
 
 @RestController
@@ -45,7 +46,7 @@ public class FilmController {
 
 
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Film findFilmByID(@PathVariable("id") Integer filmID) {
+    public Film findByID(@PathVariable("id") Integer filmID) {
         log.info("Start fetching film with id = {}", filmID);
         Film fetchedFilm = filmService.findById(filmID);
         log.info("Finish fetching film with id = {}", fetchedFilm.getId());
@@ -53,7 +54,7 @@ public class FilmController {
     }
 
     @GetMapping(value = "/name/{name}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Film findFilmByName(@PathVariable("name") String filmName) {
+    public Film findByName(@PathVariable("name") String filmName) {
         log.info("Start fetching film with name = {}", filmName);
         Film fetchedFilm = filmService.findByName(filmName);
         log.info("Finish fetching film with name = {}", filmName);
@@ -85,44 +86,50 @@ public class FilmController {
         return areDeleted;
     }
 
+    @PutMapping("/{id}/like/{userId}")
+    public void addLike(@PathVariable("id") Integer filmId, @PathVariable("userId") Integer userId) {
+        log.info("Start adding like to film with id = {} from user with id = {}", filmId, userId);
+        filmService.addLike(filmId, userId);
+        log.info("Finish adding like to film with id = {} from user with id = {}", filmId, userId);
+    }
 
+    @DeleteMapping("/{id}/like/{userId}")
+    public boolean removeLike(@PathVariable("id") Integer filmId, @PathVariable("userId") Integer userId) {
+        log.info("Start removing like to film with id = {} from user with id = {}", filmId, userId);
+        boolean isRemoved = filmService.removeLike(filmId, userId);
+        log.info("Finish removing like to film with id = {} from user with id = {}", filmId, userId);
+        return isRemoved;
+    }
 
-//    private FilmService filmService;
-//
-//
-//    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-//    public Film create(@Valid @RequestBody Film film) {
-//        return filmService.create(film);
-//    }
-//
-//    @PutMapping
-//    public Film put(@Valid @RequestBody Film updatedFilm) {
-//        return filmService.put(updatedFilm);
-//    }
-//
-//    @GetMapping
-//    public List<Film> findAll() {
-//        return filmService.findAll();
-//    }
-//
-//    @PutMapping("/{id}/like/{userId}")
-//    public Film addLike(@PathVariable("id") Integer filmId, @PathVariable("userId") Integer userId) {
-//        return filmService.addLike(filmId, userId);
-//    }
-//
-//    @DeleteMapping("/{id}/like/{userId}")
-//    public Film removeLike(@PathVariable("id") Integer filmId, @PathVariable("userId") Integer userId) {
-//        return filmService.removeLike(filmId, userId);
-//    }
-//
-//    @GetMapping(value = "/popular", produces = MediaType.APPLICATION_JSON_VALUE)
-//    public List<Film> getTopByLikes(@RequestParam(defaultValue = "10")  @Positive Integer count) {
-//        return filmService.getTopByLikes(count);
-//    }
-//
-//    @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-//    public Film findFilmByID(@PathVariable("id") Integer filmID) {
-//        return filmService.findFilmByID(filmID);
-//    }
+    @GetMapping(value = "/popular", produces = MediaType.APPLICATION_JSON_VALUE)
+    public List<Film> getTopByLikes(@RequestParam(defaultValue = "10")  @Positive Integer count) {
+        log.info("Start fetching {} top films by likes", count);
+        List<Film> topFilms = filmService.getTopByLikes(count);
+        log.info("Finish fetching {} top films by likes", count);
+        return topFilms;
+    }
+
+    @PutMapping("/{id}/genre")
+    public void addGenres(@PathVariable("id") Integer filmId, @RequestBody List<Integer> genreIds) {
+        log.info("Start adding genres to film {}", filmId);
+        filmService.addGenres(filmId, genreIds);
+        log.info("Finish adding genres to film {}", filmId);
+    }
+
+    @DeleteMapping("/{id}/genre/{genreName}")
+    public boolean removeGenre(@PathVariable("id") Integer filmId, @PathVariable("genreName") String genreName) {
+        log.info("Start removing genre with name {} from film with id = {}", genreName, filmId);
+        boolean isRemoved = filmService.removeGenre(filmId, genreName);
+        log.info("Finish removing genre with name {} from film with id = {}", genreName, filmId);
+        return isRemoved;
+    }
+
+    @GetMapping("/{id}/genre")
+    public List<String> getGenresNamesById(@PathVariable("id") Integer filmId) {
+        log.info("Start fetching all genres of film with id = {}", filmId);
+        List<String> fetchedGenreNames = filmService.findGenresNames(filmId);
+        log.info("Finish fetching all genres of film with id = {}", filmId);
+        return fetchedGenreNames;
+    }
 
 }

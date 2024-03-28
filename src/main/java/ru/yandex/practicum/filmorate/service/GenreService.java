@@ -15,7 +15,7 @@ public interface GenreService {
 
     List<Genre> findAll();
 
-    Genre findGenreByID(Integer genreID);
+    Genre findByID(Integer genreID);
 
     Genre findByName(String genreName);
 

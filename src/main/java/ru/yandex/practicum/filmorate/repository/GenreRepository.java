@@ -12,7 +12,7 @@ public interface GenreRepository {
 
     boolean update(Genre genre);
 
-    Genre findGenreByID(Integer genreID);
+    Genre findByID(Integer genreID);
 
     Genre findByName(String genreName);
 

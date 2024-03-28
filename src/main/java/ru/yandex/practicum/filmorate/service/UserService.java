@@ -24,7 +24,7 @@ public interface UserService {
 
     void addFriend(Integer userId, Integer friendId);
 
-    List<Integer> findUsersFriendsIds(Integer userId);
+    List<Integer> findFriendsIdsById(Integer userId);
 
     boolean removeFriend(Integer userId, Integer friendId);
 

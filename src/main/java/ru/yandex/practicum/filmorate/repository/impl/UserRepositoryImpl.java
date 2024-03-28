@@ -184,7 +184,7 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public List<Integer> findUsersFriendsIds(Integer userId) {
+    public List<Integer> findFriendsIdsById(Integer userId) {
         String sqlQuery = "SELECT friend_id FROM USER_FRIENDSHIP WHERE user_id = ? ORDER BY friend_id";
 
         return jdbcTemplate.queryForList(sqlQuery, Integer.class, userId);
@@ -200,6 +200,7 @@ public class UserRepositoryImpl implements UserRepository {
 
         return jdbcTemplate.queryForList(sqlQuery, Integer.class, user1ID, user2ID);
     }
+
 
 
     private static RowMapper<User> userRowMapper() {

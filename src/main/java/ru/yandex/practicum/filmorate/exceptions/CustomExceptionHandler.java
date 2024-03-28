@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.exceptions;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -41,6 +42,23 @@ public class CustomExceptionHandler {
                 e.getMessage()
         );
     }
+
+
+//    @ExceptionHandler(EmptyResultDataAccessException.class)
+//    @ResponseStatus(HttpStatus.NOT_FOUND)
+//    public ErrorResponse handleEmptyResultDataAccessException(EmptyResultDataAccessException e) {
+//        log.debug("Получен статус 404 Not Found {}", e.getMessage(), e);
+//        return new ErrorResponse(e.getMessage());
+//    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ErrorResponse handleEmptyResultDataAccessException(EmptyResultDataAccessException e) {
+        log.debug("Получен статус 404 Not Found {}", e.getMessage(), e);
+        return new ErrorResponse("Entity not found");
+    }
+
+
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)

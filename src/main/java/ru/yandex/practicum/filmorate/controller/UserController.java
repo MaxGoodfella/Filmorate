@@ -50,7 +50,7 @@ public class UserController {
     }
 
     @GetMapping(value = "/name/{name}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public User findUserByName(@PathVariable("name") String userName) {
+    public User findByName(@PathVariable("name") String userName) {
         log.info("Start fetching user with name = {}", userName);
         User fetchedUser = userService.findByName(userName);
         log.info("Finish fetching user with name = {}", userName);
@@ -88,20 +88,20 @@ public class UserController {
         log.info("Finish adding friend with id = {} to user with id = {}", friendId, userId);
     }
 
-    @GetMapping(value = "/{id}/friends", produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<Integer> findUsersFriendsIds(@PathVariable("id") Integer userID) {
-        log.info("Start fetching all friends of user with id = {}", userID);
-        List<Integer> fetchedUsers = userService.findUsersFriendsIds(userID);
-        log.info("Finish fetching all friends of user with id = {}", userID);
-        return fetchedUsers;
-    }
-
     @DeleteMapping("/{id}/friends/{friendId}")
     public boolean removeFriend(@PathVariable("id") Integer userId, @PathVariable("friendId") Integer friendId) {
         log.info("Start removing friend with id = {} from user with id = {}", friendId, userId);
         boolean isRemoved = userService.removeFriend(userId, friendId);
         log.info("Finish removing friend with id = {} from user with id = {}", friendId, userId);
         return isRemoved;
+    }
+
+    @GetMapping(value = "/{id}/friends", produces = MediaType.APPLICATION_JSON_VALUE)
+    public List<Integer> findFriendsIdsById(@PathVariable("id") Integer userID) {
+        log.info("Start fetching all friends of user with id = {}", userID);
+        List<Integer> fetchedUsers = userService.findFriendsIdsById(userID);
+        log.info("Finish fetching all friends of user with id = {}", userID);
+        return fetchedUsers;
     }
 
     @GetMapping(value = "/{id}/friends/common/{otherId}", produces = MediaType.APPLICATION_JSON_VALUE)

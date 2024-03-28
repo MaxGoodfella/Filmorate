@@ -60,7 +60,7 @@ public class GenreRepositoryImpl implements GenreRepository {
 
 
     @Override
-    public Genre findGenreByID(Integer genreID) {
+    public Genre findByID(Integer genreID) {
         return jdbcTemplate.queryForObject(
                 "select * from GENRES where genre_id = ?",
                 genreRowMapper(),
@@ -115,6 +115,7 @@ public class GenreRepositoryImpl implements GenreRepository {
 
         return jdbcTemplate.update(sqlQuery) > 0;
     }
+
 
 
     private static RowMapper<Genre> genreRowMapper() {

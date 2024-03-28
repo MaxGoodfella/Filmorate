@@ -273,16 +273,16 @@ public class UserRepositoryImplTest {
 
     @Test
     public void testUpdate() {
-        User newUser = new User(1, "user1", "user1@gmail.com", "User1 Name",
+        User newUser = new User("user1", "user1@gmail.com", "User1 Name",
                 LocalDate.of(1990, 1, 1));
         userRepositoryImpl.save(newUser);
 
-        User updatedUser = new User(1, "user2", "user2@gmail.com", "User2 Name",
+        User updatedUser = new User(newUser.getId(), "user2", "user2@gmail.com", "User2 Name",
                 LocalDate.of(1995, 5, 5));
 
         assertDoesNotThrow(() -> userRepositoryImpl.update(updatedUser));
 
-        User finalUser = userRepositoryImpl.findById(1);
+        User finalUser = userRepositoryImpl.findById(newUser.getId());
 
         Assertions.assertEquals(updatedUser, finalUser, "Информация о пользователе должна быть обновлена");
         Assertions.assertEquals("User2 Name", finalUser.getLogin(), "Логин не совпадает");
@@ -290,7 +290,7 @@ public class UserRepositoryImplTest {
         Assertions.assertEquals("user2@gmail.com", finalUser.getEmail(), "Почта не совпадает");
         Assertions.assertEquals(LocalDate.of(1995, 5, 5), finalUser.getBirthday(),
                 "Дата рождения не совпадает");
-    } // ни в какую не хочет проходить
+    }
 
 
     @Test
@@ -344,8 +344,8 @@ public class UserRepositoryImplTest {
 
         userRepositoryImpl.addFriend(newUser1.getId(), newUser2.getId());
 
-        assertTrue(userRepositoryImpl.findUsersFriendsIds(newUser1.getId()).contains(newUser2.getId()));
-        assertTrue(userRepositoryImpl.findUsersFriendsIds(newUser2.getId()).contains(newUser1.getId()));
+        assertTrue(userRepositoryImpl.findFriendsIdsById(newUser1.getId()).contains(newUser2.getId()));
+        assertTrue(userRepositoryImpl.findFriendsIdsById(newUser2.getId()).contains(newUser1.getId()));
     }
 
     @Test
@@ -360,13 +360,13 @@ public class UserRepositoryImplTest {
 
         userRepositoryImpl.addFriend(newUser1.getId(), newUser2.getId());
 
-        assertTrue(userRepositoryImpl.findUsersFriendsIds(newUser1.getId()).contains(newUser2.getId()));
-        assertTrue(userRepositoryImpl.findUsersFriendsIds(newUser2.getId()).contains(newUser1.getId()));
+        assertTrue(userRepositoryImpl.findFriendsIdsById(newUser1.getId()).contains(newUser2.getId()));
+        assertTrue(userRepositoryImpl.findFriendsIdsById(newUser2.getId()).contains(newUser1.getId()));
 
         userRepositoryImpl.removeFriend(newUser1.getId(), newUser2.getId());
 
-        assertFalse(userRepositoryImpl.findUsersFriendsIds(newUser1.getId()).contains(newUser2.getId()));
-        assertFalse(userRepositoryImpl.findUsersFriendsIds(newUser2.getId()).contains(newUser1.getId()));
+        assertFalse(userRepositoryImpl.findFriendsIdsById(newUser1.getId()).contains(newUser2.getId()));
+        assertFalse(userRepositoryImpl.findFriendsIdsById(newUser2.getId()).contains(newUser1.getId()));
     }
 
     @Test
@@ -385,16 +385,16 @@ public class UserRepositoryImplTest {
         userRepositoryImpl.addFriend(newUser1.getId(), newUser2.getId());
         userRepositoryImpl.addFriend(newUser1.getId(), newUser3.getId());
 
-        List<Integer> user1friendsIds = userRepositoryImpl.findUsersFriendsIds(newUser1.getId());
+        List<Integer> user1friendsIds = userRepositoryImpl.findFriendsIdsById(newUser1.getId());
         assertEquals(2, user1friendsIds.size());
         assertTrue(user1friendsIds.contains(newUser2.getId()));
         assertTrue(user1friendsIds.contains(newUser3.getId()));
 
-        List<Integer> user2friendsIds = userRepositoryImpl.findUsersFriendsIds(newUser2.getId());
+        List<Integer> user2friendsIds = userRepositoryImpl.findFriendsIdsById(newUser2.getId());
         assertEquals(1, user2friendsIds.size());
         assertTrue(user2friendsIds.contains(newUser1.getId()));
 
-        List<Integer> user3friendsIds = userRepositoryImpl.findUsersFriendsIds(newUser3.getId());
+        List<Integer> user3friendsIds = userRepositoryImpl.findFriendsIdsById(newUser3.getId());
         assertEquals(1, user3friendsIds.size());
         assertTrue(user3friendsIds.contains(newUser1.getId()));
     }

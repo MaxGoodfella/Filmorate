@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.repository;
 
 import ru.yandex.practicum.filmorate.model.Film;
 
+import java.time.LocalDate;
 import java.util.List;
 
 public interface FilmRepository {
@@ -18,24 +19,31 @@ public interface FilmRepository {
 
     Integer findIdByName(String name);
 
+    Film findByNameDescriptionReleaseDateAndDuration(String name, String description,
+                                                     LocalDate releaseDate, int duration);
+
     List<Film> findAll();
 
     boolean deleteById(Integer filmID);
 
     boolean deleteAll();
 
-// save
-// delete
-    // update film
+    void addLike(Integer filmId, Integer userId);
 
+    boolean removeLike(Integer filmId, Integer userId);
 
-    // add genre to film
-    // remove genre from film
+    List<Integer> findFansIds(Integer filmId);
 
-    // add rating to film
-    // remove rating from film
+    boolean existsLike(Integer filmId, Integer userId);
 
-    // add like (update film_fans) + count popularity for film_id by user_id amount
+    List<Film> getTopByLikes(Integer count);
 
+    void addGenres(Integer filmId, List<Integer> genreIds);
+
+    boolean removeGenre(Integer filmId, String genreName);
+
+    List<String> findGenresNames(Integer filmId);
+
+    boolean existsGenre(Integer filmId, Integer genreId);
 
 }

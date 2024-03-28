@@ -20,4 +20,5 @@ public class Rating {
         this.id = id;
         return this;
     }
+
 }

@@ -33,13 +33,36 @@ public class Film {
     @Positive
     private int duration;
 
-//    @Singular
-//    private final Set<Integer> likes = new HashSet<>();
-//
-//    private Integer genre;
-//
-//    private Integer rating;
+    private Integer rating;
+
+    private Integer popularity;
 
 
+    public Film(String name, String description, LocalDate releaseDate, int duration, Integer rating, Integer popularity) {
+        this.name = name;
+        this.description = description;
+        this.releaseDate = releaseDate;
+        this.duration = duration;
+        this.rating = rating;
+        this.popularity = popularity;
+    }
+
+
+    public Film(String name, String description, LocalDate releaseDate, int duration, Integer popularity) {
+        this.name = name;
+        this.description = description;
+        this.releaseDate = releaseDate;
+        this.duration = duration;
+        this.popularity = popularity;
+    }
+
+    public Film(Integer id, String name, String description, LocalDate releaseDate, int duration, Integer popularity) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.releaseDate = releaseDate;
+        this.duration = duration;
+        this.popularity = popularity;
+    }
 
 }

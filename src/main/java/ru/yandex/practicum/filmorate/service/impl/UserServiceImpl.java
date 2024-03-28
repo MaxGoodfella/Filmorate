@@ -69,7 +69,6 @@ public class UserServiceImpl implements UserService {
 
     }
 
-
     @Override
     public void update(User user) {
         validateUser(user);
@@ -81,7 +80,6 @@ public class UserServiceImpl implements UserService {
                     "User with id = " + user.getId() + " hasn't been found");
         }
     }
-
 
     @Override
     public User findById(Integer id) {
@@ -121,7 +119,7 @@ public class UserServiceImpl implements UserService {
 
         User user = userRepository.findById(userId);
         User friend = userRepository.findById(friendId);
-        List<Integer> usersFriendsIds = userRepository.findUsersFriendsIds(userId);
+        List<Integer> usersFriendsIds = userRepository.findFriendsIdsById(userId);
 
         if (user == null) {
             throw new EntityNotFoundException(User.class, "User with id = " + userId + " hasn't been found");
@@ -145,12 +143,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<Integer> findUsersFriendsIds(Integer userId) {
+    public List<Integer> findFriendsIdsById(Integer userId) {
         if (userRepository.findById(userId) == null) {
             throw new EntityNotFoundException(User.class, "User with id = " + userId + " hasn't been found");
         }
 
-        return userRepository.findUsersFriendsIds(userId);
+        return userRepository.findFriendsIdsById(userId);
     }
 
     @Override
@@ -158,7 +156,7 @@ public class UserServiceImpl implements UserService {
 
         User user = userRepository.findById(userId);
         User friend = userRepository.findById(friendId);
-        List<Integer> usersFriendsIds = userRepository.findUsersFriendsIds(userId);
+        List<Integer> usersFriendsIds = userRepository.findFriendsIdsById(userId);
 
         if (user == null) {
             throw new EntityNotFoundException(User.class, "User with id = " + userId + " hasn't been found");
@@ -174,8 +172,8 @@ public class UserServiceImpl implements UserService {
         }
 
         return userRepository.removeFriend(userId, friendId);
-    }
 
+    }
 
     @Override
     public List<Integer> getCommonFriends(Integer user1ID, Integer user2ID) {

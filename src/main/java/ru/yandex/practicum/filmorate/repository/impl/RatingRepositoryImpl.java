@@ -60,7 +60,7 @@ public class RatingRepositoryImpl implements RatingRepository {
 
 
     @Override
-    public Rating findRatingByID(Integer ratingID) {
+    public Rating findByID(Integer ratingID) {
         return jdbcTemplate.queryForObject(
                 "select * from FILM_RATING where rating_id = ?",
                 ratingRowMapper(),
@@ -115,6 +115,7 @@ public class RatingRepositoryImpl implements RatingRepository {
 
         return jdbcTemplate.update(sqlQuery) > 0;
     }
+
 
 
     private static RowMapper<Rating> ratingRowMapper() {

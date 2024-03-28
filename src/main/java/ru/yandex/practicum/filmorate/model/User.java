@@ -36,6 +36,13 @@ public class User {
         this.birthday = birthday;
     }
 
+    public User(String name, String email, String login, LocalDate birthday) {
+        this.name = name;
+        this.email = email;
+        this.login = login;
+        this.birthday = birthday;
+    }
+
     public User setId(Integer id) {
         this.id = id;
         return this;

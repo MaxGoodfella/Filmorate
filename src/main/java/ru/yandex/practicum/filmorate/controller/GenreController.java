@@ -44,17 +44,15 @@ public class GenreController {
     }
 
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Genre findGenreByID(@PathVariable("id") Integer genreID) {
+    public Genre findByID(@PathVariable("id") Integer genreID) {
         log.info("Start fetching genre with id = {}", genreID);
-        Genre fetchedGenre = genreService.findGenreByID(genreID);
-        String genreString = String.valueOf(fetchedGenre);
-        log.info("what's here: " + genreString);
+        Genre fetchedGenre = genreService.findByID(genreID);
         log.info("Finish fetching genre with id = {}", fetchedGenre.getId());
         return fetchedGenre;
     }
 
     @GetMapping(value = "/name/{name}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Genre findGenreByName(@PathVariable("name") String genreName) {
+    public Genre findByName(@PathVariable("name") String genreName) {
         log.info("Start fetching genre with name = {}", genreName);
         Genre fetchedGenre = genreService.findByName(genreName);
         log.info("Finish fetching genre with name = {}", genreName);

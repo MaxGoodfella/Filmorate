@@ -43,15 +43,15 @@ public class RatingController {
     }
 
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Rating findRatingByID(@PathVariable("id") Integer ratingID) {
+    public Rating findByID(@PathVariable("id") Integer ratingID) {
         log.info("Start fetching rating with id = {}", ratingID);
-        Rating fetchedRating = ratingService.findRatingByID(ratingID);
+        Rating fetchedRating = ratingService.findByID(ratingID);
         log.info("Finish fetching rating with id = {}", fetchedRating.getId());
         return fetchedRating;
     }
 
     @GetMapping(value = "/name/{name}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Rating findGenreByName(@PathVariable("name") String ratingName) {
+    public Rating findByName(@PathVariable("name") String ratingName) {
         log.info("Start fetching rating with name = {}", ratingName);
         Rating fetchedRating = ratingService.findByName(ratingName);
         log.info("Finish fetching rating with name = {}", ratingName);

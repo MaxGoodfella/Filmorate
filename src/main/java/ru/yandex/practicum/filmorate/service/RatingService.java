@@ -15,7 +15,7 @@ public interface RatingService {
 
     List<Rating> findAll();
 
-    Rating findRatingByID(Integer ratingID);
+    Rating findByID(Integer ratingID);
 
     Rating findByName(String ratingName);
 

@@ -32,7 +32,7 @@ public interface UserRepository {
 
     boolean removeFriend(Integer userId, Integer friendId);
 
-    List<Integer> findUsersFriendsIds(Integer userId);
+    List<Integer> findFriendsIdsById(Integer userId);
 
     List<Integer> getCommonFriends(Integer user1ID, Integer user2ID);
 

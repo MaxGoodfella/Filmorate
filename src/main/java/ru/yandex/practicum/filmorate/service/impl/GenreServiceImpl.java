@@ -68,9 +68,9 @@ public class GenreServiceImpl implements GenreService {
     }
 
     @Override
-    public Genre findGenreByID(Integer genreID) {
+    public Genre findByID(Integer genreID) {
         try {
-            return genreRepository.findGenreByID(genreID);
+            return genreRepository.findByID(genreID);
         } catch (EmptyResultDataAccessException ex) {
             throw new EntityNotFoundException(Genre.class, "Genre with id = " + genreID + " hasn't been found");
         }
