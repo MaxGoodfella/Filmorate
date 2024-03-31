@@ -97,7 +97,7 @@ public class RatingRepositoryImpl implements RatingRepository {
     @Override
     public List<Rating> findAll() {
         return jdbcTemplate.query(
-                "select * from FILM_RATING",
+                "select * from FILM_RATING ORDER BY RATING_ID",
                 ratingRowMapper());
     }
 

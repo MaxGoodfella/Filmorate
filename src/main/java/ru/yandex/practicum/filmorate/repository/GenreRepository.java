@@ -24,4 +24,8 @@ public interface GenreRepository {
 
     boolean deleteAll();
 
+    List<Genre> add(Integer filmId, List<Genre> genres);
+
+    List<Genre> findGenresForFilm(Integer filmId);
+
 }

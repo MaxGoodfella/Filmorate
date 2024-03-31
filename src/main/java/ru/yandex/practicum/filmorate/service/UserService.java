@@ -10,7 +10,7 @@ public interface UserService {
 
     void saveMany(List<User> newUsers);
 
-    void update(User user);
+    User update(User user);
 
     User findById(Integer id);
 
@@ -24,10 +24,10 @@ public interface UserService {
 
     void addFriend(Integer userId, Integer friendId);
 
-    List<Integer> findFriendsIdsById(Integer userId);
+    List<User> findFriendsById(Integer userId);
 
     boolean removeFriend(Integer userId, Integer friendId);
 
-    List<Integer> getCommonFriends(Integer user1ID, Integer user2ID);
+    List<User> getCommonFriends(Integer user1ID, Integer user2ID);
 
 }

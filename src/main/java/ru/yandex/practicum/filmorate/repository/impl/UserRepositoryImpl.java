@@ -170,35 +170,41 @@ public class UserRepositoryImpl implements UserRepository {
                 userId,
                 friendId);
 
-        jdbcTemplate.update(sqlQuery,
-                friendId,
-                userId);
+//        jdbcTemplate.update(sqlQuery,
+//                friendId,
+//                userId);
     }
 
     @Override
     public boolean removeFriend(Integer userId, Integer friendId) {
         String sqlQuery = "DELETE FROM USER_FRIENDSHIP " +
-                "WHERE (user_id = ? AND friend_id = ?) OR (user_id = ? AND friend_id = ?)";
-        int rowsDeleted = jdbcTemplate.update(sqlQuery, userId, friendId, friendId, userId);
+                "WHERE user_id = ? AND friend_id = ?";
+        int rowsDeleted = jdbcTemplate.update(sqlQuery, userId, friendId);
         return rowsDeleted > 0;
     }
 
-    @Override
-    public List<Integer> findFriendsIdsById(Integer userId) {
-        String sqlQuery = "SELECT friend_id FROM USER_FRIENDSHIP WHERE user_id = ? ORDER BY friend_id";
 
-        return jdbcTemplate.queryForList(sqlQuery, Integer.class, userId);
+    @Override
+    public List<User> findFriendsById(Integer userId) {
+        String sqlQuery = "SELECT u.* " +
+                "FROM USERS u " +
+                "JOIN USER_FRIENDSHIP uf ON u.user_id = uf.friend_id " +
+                "WHERE uf.user_id = ? " +
+                "ORDER BY u.user_id";
+
+        return jdbcTemplate.query(sqlQuery, userRowMapper(), userId);
     }
 
     @Override
-    public List<Integer> getCommonFriends(Integer user1ID, Integer user2ID) {
-        String sqlQuery = "SELECT uf1.friend_id " +
-                          "FROM USER_FRIENDSHIP uf1 " +
-                          "INNER JOIN USER_FRIENDSHIP uf2 ON uf1.friend_id = uf2.friend_id " +
-                          "WHERE uf1.user_id = ? AND uf2.user_id = ?" +
-                          "ORDER BY uf1.friend_id";
+    public List<User> getCommonFriends(Integer user1ID, Integer user2ID) {
+        String sqlQuery = "SELECT u.* " +
+                "FROM USERS u " +
+                "JOIN USER_FRIENDSHIP uf1 ON u.user_id = uf1.friend_id " +
+                "JOIN USER_FRIENDSHIP uf2 ON u.user_id = uf2.friend_id " +
+                "WHERE uf1.user_id = ? AND uf2.user_id = ? " +
+                "ORDER BY u.user_id";
 
-        return jdbcTemplate.queryForList(sqlQuery, Integer.class, user1ID, user2ID);
+        return jdbcTemplate.query(sqlQuery, userRowMapper(), user1ID, user2ID);
     }
 
 
@@ -219,5 +225,6 @@ public class UserRepositoryImpl implements UserRepository {
                 "login", user.getLogin(),
                 "date_of_birth", user.getBirthday().toString());
     }
+
 
 }

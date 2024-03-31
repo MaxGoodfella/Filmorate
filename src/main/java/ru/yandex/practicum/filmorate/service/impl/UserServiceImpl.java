@@ -70,7 +70,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void update(User user) {
+    public User update(User user) {
         validateUser(user);
 
         boolean isSuccess = userRepository.update(user);
@@ -79,6 +79,8 @@ public class UserServiceImpl implements UserService {
             throw new EntityNotFoundException(User.class,
                     "User with id = " + user.getId() + " hasn't been found");
         }
+
+        return user;
     }
 
     @Override
@@ -119,7 +121,7 @@ public class UserServiceImpl implements UserService {
 
         User user = userRepository.findById(userId);
         User friend = userRepository.findById(friendId);
-        List<Integer> usersFriendsIds = userRepository.findFriendsIdsById(userId);
+        List<User> usersFriends = userRepository.findFriendsById(userId);
 
         if (user == null) {
             throw new EntityNotFoundException(User.class, "User with id = " + userId + " hasn't been found");
@@ -133,7 +135,7 @@ public class UserServiceImpl implements UserService {
             throw new IllegalArgumentException("user_ID matches friend_ID");
         }
 
-        if (usersFriendsIds.contains(friendId)) {
+        if (usersFriends.contains(friend)) {
             throw new EntityAlreadyExistsException(Integer.class, "Friend with id = " + friendId +
                     " is already in the list of friends of user with id = " + userId);
         }
@@ -143,12 +145,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<Integer> findFriendsIdsById(Integer userId) {
+    public List<User> findFriendsById(Integer userId) {
         if (userRepository.findById(userId) == null) {
             throw new EntityNotFoundException(User.class, "User with id = " + userId + " hasn't been found");
         }
 
-        return userRepository.findFriendsIdsById(userId);
+        return userRepository.findFriendsById(userId);
     }
 
     @Override
@@ -156,7 +158,7 @@ public class UserServiceImpl implements UserService {
 
         User user = userRepository.findById(userId);
         User friend = userRepository.findById(friendId);
-        List<Integer> usersFriendsIds = userRepository.findFriendsIdsById(userId);
+        //List<Integer> usersFriendsIds = userRepository.findFriendsIdsById(userId);
 
         if (user == null) {
             throw new EntityNotFoundException(User.class, "User with id = " + userId + " hasn't been found");
@@ -166,17 +168,20 @@ public class UserServiceImpl implements UserService {
             throw new EntityNotFoundException(User.class, "Friend with id = " + friendId + " hasn't been found");
         }
 
-        if (!usersFriendsIds.contains(friendId)) {
-            throw new EntityNotFoundException(Integer.class, "Friend with id = " + friendId +
-                    " is not yet in the list of friends of user with id = " + userId);
-        }
+        // оставляю то, что ниже, так как на мой взгляд это странно, что у нас есть возможность удалить "друга",
+        // которого нет на самом деле в друзьях
+
+//        if (!usersFriendsIds.contains(friendId)) {
+//            throw new EntityNotFoundException(Integer.class, "Friend with id = " + friendId +
+//                    " is not yet in the list of friends of user with id = " + userId);
+//        }
 
         return userRepository.removeFriend(userId, friendId);
 
     }
 
     @Override
-    public List<Integer> getCommonFriends(Integer user1ID, Integer user2ID) {
+    public List<User> getCommonFriends(Integer user1ID, Integer user2ID) {
 
         User user1 = userRepository.findById(user1ID);
         User user2 = userRepository.findById(user2ID);

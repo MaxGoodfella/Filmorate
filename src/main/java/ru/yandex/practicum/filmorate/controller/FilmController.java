@@ -6,6 +6,7 @@ import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
 import javax.validation.Valid;
@@ -29,19 +30,19 @@ public class FilmController {
         return savedFilm;
     }
 
-    @PostMapping(value = "/multiple", produces = MediaType.APPLICATION_JSON_VALUE)
-    public void saveMany(@Valid @RequestBody List<Film> newFilms) {
-        log.info("Start saving films {}", newFilms);
-        filmService.saveMany(newFilms);
-        log.info("Finish saving films {}", newFilms);
-    }
-
+//    @PostMapping(value = "/multiple", produces = MediaType.APPLICATION_JSON_VALUE)
+//    public void saveMany(@Valid @RequestBody List<Film> newFilms) {
+//        log.info("Start saving films {}", newFilms);
+//        filmService.saveMany(newFilms);
+//        log.info("Finish saving films {}", newFilms);
+//    }
 
     @PutMapping
-    public void update(@Valid @RequestBody Film film) {
+    public Film update(@Valid @RequestBody Film film) {
         log.info("Start updating film {}", film);
-        filmService.update(film);
+        Film savedFilm = filmService.update(film);
         log.info("Finish updating film {}", film);
+        return savedFilm;
     }
 
 
@@ -101,35 +102,51 @@ public class FilmController {
         return isRemoved;
     }
 
-    @GetMapping(value = "/popular", produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<Film> getTopByLikes(@RequestParam(defaultValue = "10")  @Positive Integer count) {
-        log.info("Start fetching {} top films by likes", count);
-        List<Film> topFilms = filmService.getTopByLikes(count);
-        log.info("Finish fetching {} top films by likes", count);
-        return topFilms;
-    }
-
-    @PutMapping("/{id}/genre")
-    public void addGenres(@PathVariable("id") Integer filmId, @RequestBody List<Integer> genreIds) {
-        log.info("Start adding genres to film {}", filmId);
-        filmService.addGenres(filmId, genreIds);
-        log.info("Finish adding genres to film {}", filmId);
-    }
-
-    @DeleteMapping("/{id}/genre/{genreName}")
-    public boolean removeGenre(@PathVariable("id") Integer filmId, @PathVariable("genreName") String genreName) {
-        log.info("Start removing genre with name {} from film with id = {}", genreName, filmId);
-        boolean isRemoved = filmService.removeGenre(filmId, genreName);
-        log.info("Finish removing genre with name {} from film with id = {}", genreName, filmId);
-        return isRemoved;
-    }
-
-    @GetMapping("/{id}/genre")
-    public List<String> getGenresNamesById(@PathVariable("id") Integer filmId) {
-        log.info("Start fetching all genres of film with id = {}", filmId);
-        List<String> fetchedGenreNames = filmService.findGenresNames(filmId);
-        log.info("Finish fetching all genres of film with id = {}", filmId);
-        return fetchedGenreNames;
-    }
+//    @GetMapping(value = "/popular", produces = MediaType.APPLICATION_JSON_VALUE)
+//    public List<Film> getTopByLikes(@RequestParam(defaultValue = "10")  @Positive Integer count) {
+//        log.info("Start fetching {} top films by likes", count);
+//        List<Film> topFilms = filmService.getTopByLikes(count);
+//        log.info("Finish fetching {} top films by likes", count);
+//        return topFilms;
+//    }
+//
+////    @PutMapping("/{id}/genre")
+////    public void addGenres(@PathVariable("id") Integer filmId, @RequestBody List<Integer> genreIds) {
+////        log.info("Start adding genres to film {}", filmId);
+////        filmService.addGenres(filmId, genreIds);
+////        log.info("Finish adding genres to film {}", filmId);
+////    }
+//
+////    @DeleteMapping("/{id}/genre/{genreName}")
+////    public boolean removeGenre(@PathVariable("id") Integer filmId, @PathVariable("genreName") String genreName) {
+////        log.info("Start removing genre with name {} from film with id = {}", genreName, filmId);
+////        boolean isRemoved = filmService.removeGenre(filmId, genreName);
+////        log.info("Finish removing genre with name {} from film with id = {}", genreName, filmId);
+////        return isRemoved;
+////    }
+//
+//    @DeleteMapping("/{id}/genre/{genreId}")
+//    public boolean removeGenre(@PathVariable("id") Integer filmId, @PathVariable("genreId") Integer genreId) {
+//        log.info("Start removing genre with id = {} from film with id = {}", genreId, filmId);
+//        boolean isRemoved = filmService.removeGenre(filmId, genreId);
+//        log.info("Finish removing genre with id = {} from film with id = {}", genreId, filmId);
+//        return isRemoved;
+//    }
+//
+////    @GetMapping("/{id}/genre")
+////    public List<String> getGenresNamesById(@PathVariable("id") Integer filmId) {
+////        log.info("Start fetching all genres of film with id = {}", filmId);
+////        List<String> fetchedGenreNames = filmService.findGenresNames(filmId);
+////        log.info("Finish fetching all genres of film with id = {}", filmId);
+////        return fetchedGenreNames;
+////    }
+//
+//    @GetMapping("/{id}/genre")
+//    public List<Genre> getGenresForFilm(@PathVariable("id") Integer filmId) {
+//        log.info("Start fetching all genres of film with id = {}", filmId);
+//        List<Genre> fetchedGenres = filmService.findGenresForFilm(filmId);
+//        log.info("Finish fetching all genres of film with id = {}", filmId);
+//        return fetchedGenres;
+//    }
 
 }

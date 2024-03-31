@@ -32,8 +32,8 @@ public interface UserRepository {
 
     boolean removeFriend(Integer userId, Integer friendId);
 
-    List<Integer> findFriendsIdsById(Integer userId);
+    List<User> findFriendsById(Integer userId);
 
-    List<Integer> getCommonFriends(Integer user1ID, Integer user2ID);
+    List<User> getCommonFriends(Integer user1ID, Integer user2ID);
 
 }

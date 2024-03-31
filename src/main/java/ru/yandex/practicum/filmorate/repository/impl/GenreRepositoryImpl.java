@@ -97,7 +97,7 @@ public class GenreRepositoryImpl implements GenreRepository {
     @Override
     public List<Genre> findAll() {
         return jdbcTemplate.query(
-                "select * from GENRES",
+                "select * from GENRES ORDER BY GENRE_ID",
                 genreRowMapper());
     }
 
@@ -114,6 +114,36 @@ public class GenreRepositoryImpl implements GenreRepository {
         String sqlQuery = "delete from GENRES";
 
         return jdbcTemplate.update(sqlQuery) > 0;
+    }
+
+
+    @Override
+    public List<Genre> add(Integer filmId, List<Genre> genres) {
+        String sqlQuery = "INSERT INTO FILM_GENRE (FILM_ID, GENRE_ID) VALUES (?, ?)";
+
+        jdbcTemplate.batchUpdate(sqlQuery, new BatchPreparedStatementSetter() {
+            @Override
+            public void setValues(PreparedStatement ps, int i) throws SQLException {
+
+                ps.setInt(1, filmId);
+                ps.setInt(2, genres.get(i).getId());
+            }
+
+            @Override
+            public int getBatchSize() {
+                return genres.size();
+            }
+        });
+
+        return findGenresForFilm(filmId);
+    }
+
+    @Override
+    public List<Genre> findGenresForFilm(Integer filmId) {
+        String sqlQuery = "select distinct G.GENRE_ID, G.GENRE_NAME from FILM_GENRE AS FG " +
+                "left join GENRES AS G ON FG.GENRE_ID = G.GENRE_ID " +
+                "where FILM_ID = ?";
+        return jdbcTemplate.query(sqlQuery, genreRowMapper(), filmId);
     }
 
 

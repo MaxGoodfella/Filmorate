@@ -4,10 +4,12 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.model.IdHandler;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
 
 import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -35,10 +37,11 @@ public class UserController {
     }
 
     @PutMapping
-    public void update(@Valid @RequestBody User user) {
+    public User update(@Valid @RequestBody User user) {
         log.info("Start updating user {}", user);
-        userService.update(user);
+        User updatedUser = userService.update(user);
         log.info("Finish updating user {}", user);
+        return updatedUser;
     }
 
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -97,17 +100,17 @@ public class UserController {
     }
 
     @GetMapping(value = "/{id}/friends", produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<Integer> findFriendsIdsById(@PathVariable("id") Integer userID) {
+    public List<User> findFriendsById(@PathVariable("id") Integer userID) {
         log.info("Start fetching all friends of user with id = {}", userID);
-        List<Integer> fetchedUsers = userService.findFriendsIdsById(userID);
+        List<User> fetchedUsers = userService.findFriendsById(userID);
         log.info("Finish fetching all friends of user with id = {}", userID);
         return fetchedUsers;
     }
 
     @GetMapping(value = "/{id}/friends/common/{otherId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<Integer> getCommonFriends(@PathVariable("id") Integer user1ID, @PathVariable("otherId") Integer user2ID) {
+    public List<User> getCommonFriends(@PathVariable("id") Integer user1ID, @PathVariable("otherId") Integer user2ID) {
         log.info("Start fetching common friends of users with id = {} and id = {}", user1ID, user2ID);
-        List<Integer> fetchedUsers = userService.getCommonFriends(user1ID, user2ID);
+        List<User> fetchedUsers = userService.getCommonFriends(user1ID, user2ID);
         log.info("Finish fetching common friends of users with id = {} and id = {}", user1ID, user2ID);
         return fetchedUsers;
     }
