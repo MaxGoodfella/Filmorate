@@ -102,14 +102,14 @@ public class FilmController {
         return isRemoved;
     }
 
-//    @GetMapping(value = "/popular", produces = MediaType.APPLICATION_JSON_VALUE)
-//    public List<Film> getTopByLikes(@RequestParam(defaultValue = "10")  @Positive Integer count) {
-//        log.info("Start fetching {} top films by likes", count);
-//        List<Film> topFilms = filmService.getTopByLikes(count);
-//        log.info("Finish fetching {} top films by likes", count);
-//        return topFilms;
-//    }
-//
+    @GetMapping(value = "/popular", produces = MediaType.APPLICATION_JSON_VALUE)
+    public List<Film> getTopByLikes(@RequestParam(defaultValue = "10")  @Positive Integer count) {
+        log.info("Start fetching {} top films by likes", count);
+        List<Film> topFilms = filmService.getTopByLikes(count);
+        log.info("Finish fetching {} top films by likes", count);
+        return topFilms;
+    }
+
 ////    @PutMapping("/{id}/genre")
 ////    public void addGenres(@PathVariable("id") Integer filmId, @RequestBody List<Integer> genreIds) {
 ////        log.info("Start adding genres to film {}", filmId);

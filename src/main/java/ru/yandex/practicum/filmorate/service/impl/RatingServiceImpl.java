@@ -69,11 +69,18 @@ public class RatingServiceImpl implements RatingService {
 
     @Override
     public Rating findByID(Integer ratingID) {
-        try {
-            return ratingRepository.findByID(ratingID);
-        } catch (EmptyResultDataAccessException ex) {
+//        try {
+//            return ratingRepository.findByID(ratingID);
+//        } catch (EmptyResultDataAccessException ex) {
+//            throw new EntityNotFoundException(Rating.class, "Rating with id = " + ratingID + " hasn't been found");
+//        }
+
+        if (ratingRepository.findByID(ratingID) == null) {
             throw new EntityNotFoundException(Rating.class, "Rating with id = " + ratingID + " hasn't been found");
         }
+
+        return ratingRepository.findByID(ratingID);
+
     }
 
     @Override

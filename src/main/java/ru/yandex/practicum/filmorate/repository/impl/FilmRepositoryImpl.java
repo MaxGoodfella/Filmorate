@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.repository.impl;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -18,11 +19,13 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 
+@Slf4j
 @Repository
 @RequiredArgsConstructor
 public class FilmRepositoryImpl implements FilmRepository {
@@ -65,12 +68,18 @@ public class FilmRepositoryImpl implements FilmRepository {
 
         film.setId(newFilmId.intValue());
 
-        List<Genre> filmGenres = genreRepository.add(film.getId(), film.getGenres());
+        List<Genre> genres = film.getGenres();
+        for (Genre genre : genres) {
+            if (genreRepository.findByID(genre.getId()) == null) {
+                throw new IllegalArgumentException("All genres or one of genres " + film.getGenres() + " do not exist");
+            }
+        }
+
+        List<Genre> filmGenres = genreRepository.add(film.getId(), genres);
         film.setGenres(filmGenres);
 
-        //film.setId(newFilmId.intValue());
-
         return film;
+
     }
 
 //    @Override

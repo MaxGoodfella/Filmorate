@@ -69,11 +69,18 @@ public class GenreServiceImpl implements GenreService {
 
     @Override
     public Genre findByID(Integer genreID) {
-        try {
-            return genreRepository.findByID(genreID);
-        } catch (EmptyResultDataAccessException ex) {
+//        try {
+//            return genreRepository.findByID(genreID);
+//        } catch (EmptyResultDataAccessException ex) {
+//            throw new EntityNotFoundException(Genre.class, "Genre with id = " + genreID + " hasn't been found");
+//        }
+
+        if (genreRepository.findByID(genreID) == null) {
             throw new EntityNotFoundException(Genre.class, "Genre with id = " + genreID + " hasn't been found");
         }
+
+        return genreRepository.findByID(genreID);
+
     }
 
     @Override

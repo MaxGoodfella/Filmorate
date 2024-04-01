@@ -61,10 +61,16 @@ public class RatingRepositoryImpl implements RatingRepository {
 
     @Override
     public Rating findByID(Integer ratingID) {
-        return jdbcTemplate.queryForObject(
-                "select * from FILM_RATING where rating_id = ?",
+        List<Rating> ratings = jdbcTemplate.query(
+                "select * from FILM_RATING where rating_id = ? order by rating_id",
                 ratingRowMapper(),
                 ratingID);
+
+        if (ratings.isEmpty()) {
+            return null;
+        } else {
+            return ratings.get(0);
+        }
     }
 
     @Override

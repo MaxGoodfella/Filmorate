@@ -61,10 +61,16 @@ public class GenreRepositoryImpl implements GenreRepository {
 
     @Override
     public Genre findByID(Integer genreID) {
-        return jdbcTemplate.queryForObject(
-                "select * from GENRES where genre_id = ?",
+        List<Genre> genres = jdbcTemplate.query(
+                "select * from GENRES where genre_id = ? order by genre_id",
                 genreRowMapper(),
                 genreID);
+
+        if (genres.isEmpty()) {
+            return null;
+        } else {
+            return genres.get(0);
+        }
     }
 
     @Override
