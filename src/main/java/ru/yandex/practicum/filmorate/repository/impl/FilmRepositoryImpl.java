@@ -19,10 +19,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 @Slf4j
@@ -51,6 +48,38 @@ public class FilmRepositoryImpl implements FilmRepository {
 //        return film;
 //    }
 
+
+
+
+
+    //        List<Genre> genres = film.getGenres();
+//
+//        for (Genre genre : genres) {
+//            if (genreRepository.findByID(genre.getId()) == null) {
+//                throw new IllegalArgumentException("All genres or one of genres " + film.getGenres() + " do not exist");
+//            }
+//        }
+//
+//        List<Genre> filmGenres = genreRepository.add(film.getId(), genres);
+//        film.setGenres(filmGenres);
+//
+//        return film;
+
+//        List<Genre> genres = film.getGenres();
+//        if (genres != null) {
+//            for (Genre genre : genres) {
+//                if (genreRepository.findByID(genre.getId()) == null) {
+//                    throw new IllegalArgumentException("All genres or one of genres " + film.getGenres() + " do not exist");
+//                }
+//            }
+//
+//            List<Genre> filmGenres = genreRepository.add(film.getId(), genres);
+//            film.setGenres(filmGenres);
+//        }
+//
+//        return film;
+
+
     @Override
     public Film save(Film film) {
 
@@ -65,18 +94,34 @@ public class FilmRepositoryImpl implements FilmRepository {
 
         Map<String, Object> parameters = filmToMap(film);
         Number newFilmId = simpleJdbcInsert.executeAndReturnKey(parameters);
-
         film.setId(newFilmId.intValue());
 
-        List<Genre> genres = film.getGenres();
-        for (Genre genre : genres) {
-            if (genreRepository.findByID(genre.getId()) == null) {
-                throw new IllegalArgumentException("All genres or one of genres " + film.getGenres() + " do not exist");
-            }
-        }
 
-        List<Genre> filmGenres = genreRepository.add(film.getId(), genres);
-        film.setGenres(filmGenres);
+
+        List<Genre> genres = film.getGenres();
+        if (genres != null) {
+            Set<Integer> genreIds = new HashSet<>();
+            List<Genre> uniqueGenres = new ArrayList<>();
+
+            for (Genre genre : genres) {
+                if (!genreIds.contains(genre.getId())) {
+                    genreIds.add(genre.getId());
+                    uniqueGenres.add(genre);
+                }
+            }
+
+            List<Genre> filmGenres = new ArrayList<>();
+            for (Genre uniqueGenre : uniqueGenres) {
+                Genre existingGenre = genreRepository.findByID(uniqueGenre.getId());
+                if (existingGenre == null) {
+                    throw new IllegalArgumentException("Genre with id " + uniqueGenre.getId() + " does not exist");
+                }
+                filmGenres.add(existingGenre);
+            }
+
+            genreRepository.add(film.getId(), filmGenres);
+            film.setGenres(filmGenres);
+        }
 
         return film;
 

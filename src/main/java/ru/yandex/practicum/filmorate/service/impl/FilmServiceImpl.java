@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.service.impl;
 
+import com.sun.source.tree.LabeledStatementTree;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -9,6 +10,7 @@ import ru.yandex.practicum.filmorate.exceptions.EntityNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.repository.FilmRepository;
+import ru.yandex.practicum.filmorate.repository.GenreRepository;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
 import java.util.ArrayList;
@@ -21,17 +23,36 @@ public class FilmServiceImpl implements FilmService {
 
     private FilmRepository filmRepository;
 
+    private GenreRepository genreRepository;
+
+//        Film existingFilm = filmRepository.findByNameDescriptionReleaseDateAndDuration(
+//                newFilm.getName(), newFilm.getDescription(), newFilm.getReleaseDate(), newFilm.getDuration());
+//
+//        //List<Genre> existingGenres = genreRepository.findGenresForFilm(existingFilm.getId());
+//
+//        //if (existingFilm != null && existingGenres != null) {
+//        if (existingFilm != null) {
+//            throw new EntityAlreadyExistsException(Film.class, "Фильм с такими параметрами уже существует");
+//        }
+//
+//        return filmRepository.save(newFilm);
 
     @Override
     public Film save(Film newFilm) {
+
+
         Film existingFilm = filmRepository.findByNameDescriptionReleaseDateAndDuration(
                 newFilm.getName(), newFilm.getDescription(), newFilm.getReleaseDate(), newFilm.getDuration());
 
         if (existingFilm != null) {
-            throw new EntityAlreadyExistsException(Film.class, "Фильм с такими параметрами уже существует");
+            List<Genre> existingGenres = genreRepository.findGenresForFilm(existingFilm.getId());
+            if (existingGenres != null) {
+                throw new EntityAlreadyExistsException(Film.class, "Фильм с такими параметрами уже существует");
+            }
         }
 
         return filmRepository.save(newFilm);
+
     }
 
 //    @Override

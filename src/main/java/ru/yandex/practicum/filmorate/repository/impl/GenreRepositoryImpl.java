@@ -146,10 +146,24 @@ public class GenreRepositoryImpl implements GenreRepository {
 
     @Override
     public List<Genre> findGenresForFilm(Integer filmId) {
+
+//        String sqlQuery = "select distinct G.GENRE_ID, G.GENRE_NAME from FILM_GENRE AS FG " +
+//                "left join GENRES AS G ON FG.GENRE_ID = G.GENRE_ID " +
+//                "where FILM_ID = ?";
+//
+//        return jdbcTemplate.query(sqlQuery, genreRowMapper(), filmId);
+
         String sqlQuery = "select distinct G.GENRE_ID, G.GENRE_NAME from FILM_GENRE AS FG " +
                 "left join GENRES AS G ON FG.GENRE_ID = G.GENRE_ID " +
                 "where FILM_ID = ?";
-        return jdbcTemplate.query(sqlQuery, genreRowMapper(), filmId);
+
+        List<Genre> genres = jdbcTemplate.query(sqlQuery, genreRowMapper(), filmId);
+
+        if (genres.isEmpty()) {
+            return null;
+        } else {
+            return genres;
+        }
     }
 
 
