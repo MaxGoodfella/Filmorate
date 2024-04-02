@@ -63,8 +63,8 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Override
     public boolean update(User user) {
-        String sqlQuery = "update USERS set NAME = ?, EMAIL = ?, LOGIN = ?, DATE_OF_BIRTH = ? " +
-                "where USER_ID = ?";
+        String sqlQuery = "UPDATE USERS SET NAME = ?, EMAIL = ?, LOGIN = ?, DATE_OF_BIRTH = ? " +
+                "WHERE USER_ID = ?";
 
         int rowsAffected = jdbcTemplate.update(sqlQuery
                 , user.getName()
@@ -80,7 +80,7 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public User findById(Integer id) {
         List<User> users = jdbcTemplate.query(
-                "select * from USERS where user_id = ?",
+                "SELECT * FROM USERS WHERE USER_ID = ?",
                 userRowMapper(),
                 id);
 
@@ -94,7 +94,7 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public User findByName(String userName) {
         return jdbcTemplate.queryForObject(
-                "select * from USERS where NAME = ?",
+                "SELECT * FROM USERS WHERE NAME = ?",
                 userRowMapper(),
                 userName);
     }
@@ -102,7 +102,7 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public User findByEmail(String email) {
         List<User> users = jdbcTemplate.query(
-                "select * from USERS where EMAIL = ?",
+                "SELECT * FROM USERS WHERE EMAIL = ?",
                 userRowMapper(),
                 email);
 
@@ -116,7 +116,7 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public User findByLogin(String login) {
         List<User> users = jdbcTemplate.query(
-                "select * from USERS where LOGIN = ?",
+                "SELECT * FROM USERS WHERE LOGIN = ?",
                 userRowMapper(),
                 login);
 
@@ -129,7 +129,7 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Override
     public Integer findIdByName(String name) {
-        String sql = "SELECT user_id FROM USERS WHERE name = ?";
+        String sql = "SELECT USER_ID FROM USERS WHERE NAME = ?";
         List<Integer> userIds = jdbcTemplate.queryForList(sql, Integer.class, name);
 
         if (!userIds.isEmpty()) {
@@ -142,21 +142,21 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public List<User> findAll() {
        return jdbcTemplate.query(
-               "select * from USERS ORDER BY USER_ID",
+               "SELECT * FROM USERS ORDER BY USER_ID",
                userRowMapper());
     }
 
 
     @Override
     public boolean deleteById(Integer userID) {
-        String sqlQuery = "delete from USERS where user_id = ?";
+        String sqlQuery = "DELETE FROM USERS WHERE USER_ID = ?";
 
         return jdbcTemplate.update(sqlQuery, userID) > 0;
     }
 
     @Override
     public boolean deleteAll() {
-        String sqlQuery = "delete from USERS";
+        String sqlQuery = "DELETE FROM USERS";
 
         return jdbcTemplate.update(sqlQuery) > 0;
     }
@@ -170,6 +170,10 @@ public class UserRepositoryImpl implements UserRepository {
                 userId,
                 friendId);
 
+        /**
+         * По идее у нас идёт такая тема, что если один юзер добавляет другого, то они автоматически друзья друг другу,
+         * но зачем-то это логику решили поменять
+         */
 //        jdbcTemplate.update(sqlQuery,
 //                friendId,
 //                userId);
@@ -178,7 +182,7 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public boolean removeFriend(Integer userId, Integer friendId) {
         String sqlQuery = "DELETE FROM USER_FRIENDSHIP " +
-                "WHERE user_id = ? AND friend_id = ?";
+                "WHERE USER_ID = ? AND FRIEND_ID = ?";
         int rowsDeleted = jdbcTemplate.update(sqlQuery, userId, friendId);
         return rowsDeleted > 0;
     }
@@ -186,23 +190,23 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Override
     public List<User> findFriendsById(Integer userId) {
-        String sqlQuery = "SELECT u.* " +
-                "FROM USERS u " +
-                "JOIN USER_FRIENDSHIP uf ON u.user_id = uf.friend_id " +
-                "WHERE uf.user_id = ? " +
-                "ORDER BY u.user_id";
+        String sqlQuery = "SELECT U.* " +
+                "FROM USERS AS U " +
+                "JOIN USER_FRIENDSHIP AS UF ON U.USER_ID = UF.FRIEND_ID " +
+                "WHERE UF.USER_ID = ? " +
+                "ORDER BY U.USER_ID";
 
         return jdbcTemplate.query(sqlQuery, userRowMapper(), userId);
     }
 
     @Override
     public List<User> getCommonFriends(Integer user1ID, Integer user2ID) {
-        String sqlQuery = "SELECT u.* " +
-                "FROM USERS u " +
-                "JOIN USER_FRIENDSHIP uf1 ON u.user_id = uf1.friend_id " +
-                "JOIN USER_FRIENDSHIP uf2 ON u.user_id = uf2.friend_id " +
-                "WHERE uf1.user_id = ? AND uf2.user_id = ? " +
-                "ORDER BY u.user_id";
+        String sqlQuery = "SELECT U.* " +
+                "FROM USERS AS U " +
+                "JOIN USER_FRIENDSHIP AS UF1 ON U.USER_ID = UF1.FRIEND_ID " +
+                "JOIN USER_FRIENDSHIP AS UF2 ON U.USER_ID = UF2.FRIEND_ID " +
+                "WHERE UF1.USER_ID = ? AND UF2.USER_ID = ? " +
+                "ORDER BY U.USER_ID";
 
         return jdbcTemplate.query(sqlQuery, userRowMapper(), user1ID, user2ID);
     }
@@ -225,6 +229,5 @@ public class UserRepositoryImpl implements UserRepository {
                 "login", user.getLogin(),
                 "date_of_birth", user.getBirthday().toString());
     }
-
 
 }

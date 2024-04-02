@@ -1,7 +1,6 @@
 package ru.yandex.practicum.filmorate.service.impl;
 
 import lombok.AllArgsConstructor;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.EntityAlreadyExistsException;
 import ru.yandex.practicum.filmorate.exceptions.EntityNotFoundException;
@@ -69,18 +68,11 @@ public class GenreServiceImpl implements GenreService {
 
     @Override
     public Genre findByID(Integer genreID) {
-//        try {
-//            return genreRepository.findByID(genreID);
-//        } catch (EmptyResultDataAccessException ex) {
-//            throw new EntityNotFoundException(Genre.class, "Genre with id = " + genreID + " hasn't been found");
-//        }
-
         if (genreRepository.findByID(genreID) == null) {
             throw new EntityNotFoundException(Genre.class, "Genre with id = " + genreID + " hasn't been found");
         }
 
         return genreRepository.findByID(genreID);
-
     }
 
     @Override

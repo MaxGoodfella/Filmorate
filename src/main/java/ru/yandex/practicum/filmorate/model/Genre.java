@@ -16,6 +16,7 @@ public class Genre {
     @NotBlank
     private String name;
 
+
     public Genre setId(Integer id) {
         this.id = id;
         return this;

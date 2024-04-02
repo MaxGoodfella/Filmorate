@@ -331,100 +331,99 @@ public class UserRepositoryImplTest {
         assertDoesNotThrow(() -> userRepositoryImpl.deleteAll());
     }
 
-    //исправить ниже
 
-//    @Test
-//    public void testAddFriend() {
-//        User newUser1 = new User(1, "user1", "user1@gmail.com", "User1 Name",
-//                LocalDate.of(1990, 1, 1));
-//        User newUser2 = new User(2, "user2", "user2@gmail.com", "User2 Name",
-//                LocalDate.of(1990, 1, 1));
-//
-//        userRepositoryImpl.save(newUser1);
-//        userRepositoryImpl.save(newUser2);
-//
-//        userRepositoryImpl.addFriend(newUser1.getId(), newUser2.getId());
-//
-//        assertTrue(userRepositoryImpl.findFriendsIdsById(newUser1.getId()).contains(newUser2.getId()));
-//        assertTrue(userRepositoryImpl.findFriendsIdsById(newUser2.getId()).contains(newUser1.getId()));
-//    }
-//
-//    @Test
-//    public void testRemoveFriend() {
-//        User newUser1 = new User(1, "user1", "user1@gmail.com", "User1 Name",
-//                LocalDate.of(1990, 1, 1));
-//        User newUser2 = new User(2, "user2", "user2@gmail.com", "User2 Name",
-//                LocalDate.of(1990, 1, 1));
-//
-//        userRepositoryImpl.save(newUser1);
-//        userRepositoryImpl.save(newUser2);
-//
-//        userRepositoryImpl.addFriend(newUser1.getId(), newUser2.getId());
-//
-//        assertTrue(userRepositoryImpl.findFriendsIdsById(newUser1.getId()).contains(newUser2.getId()));
-//        assertTrue(userRepositoryImpl.findFriendsIdsById(newUser2.getId()).contains(newUser1.getId()));
-//
-//        userRepositoryImpl.removeFriend(newUser1.getId(), newUser2.getId());
-//
-//        assertFalse(userRepositoryImpl.findFriendsIdsById(newUser1.getId()).contains(newUser2.getId()));
-//        assertFalse(userRepositoryImpl.findFriendsIdsById(newUser2.getId()).contains(newUser1.getId()));
-//    }
-//
-//    @Test
-//    public void testFindUsersFriendsIds() {
-//        User newUser1 = new User(1, "user1", "user1@gmail.com", "User1 Name",
-//                LocalDate.of(1990, 1, 1));
-//        User newUser2 = new User(2, "user2", "user2@gmail.com", "User2 Name",
-//                LocalDate.of(1990, 1, 1));
-//        User newUser3 = new User(3, "user3", "user3@gmail.com", "User3 Name",
-//                LocalDate.of(1990, 1, 1));
-//
-//        userRepositoryImpl.save(newUser1);
-//        userRepositoryImpl.save(newUser2);
-//        userRepositoryImpl.save(newUser3);
-//
-//        userRepositoryImpl.addFriend(newUser1.getId(), newUser2.getId());
-//        userRepositoryImpl.addFriend(newUser1.getId(), newUser3.getId());
-//
-//        List<Integer> user1friendsIds = userRepositoryImpl.findFriendsIdsById(newUser1.getId());
-//        assertEquals(2, user1friendsIds.size());
-//        assertTrue(user1friendsIds.contains(newUser2.getId()));
-//        assertTrue(user1friendsIds.contains(newUser3.getId()));
-//
-//        List<Integer> user2friendsIds = userRepositoryImpl.findFriendsIdsById(newUser2.getId());
+    @Test
+    public void testAddFriend() {
+        User newUser1 = new User(1, "user1", "user1@gmail.com", "User1 Name",
+                LocalDate.of(1990, 1, 1));
+        User newUser2 = new User(2, "user2", "user2@gmail.com", "User2 Name",
+                LocalDate.of(1990, 1, 1));
+
+        userRepositoryImpl.save(newUser1);
+        userRepositoryImpl.save(newUser2);
+
+        userRepositoryImpl.addFriend(newUser1.getId(), newUser2.getId());
+
+        assertTrue(userRepositoryImpl.findFriendsById(newUser1.getId()).contains(newUser2));
+        //assertTrue(userRepositoryImpl.findFriendsById(newUser2.getId()).contains(newUser1.getId()));
+    }
+
+    @Test
+    public void testRemoveFriend() {
+        User newUser1 = new User(1, "user1", "user1@gmail.com", "User1 Name",
+                LocalDate.of(1990, 1, 1));
+        User newUser2 = new User(2, "user2", "user2@gmail.com", "User2 Name",
+                LocalDate.of(1990, 1, 1));
+
+        userRepositoryImpl.save(newUser1);
+        userRepositoryImpl.save(newUser2);
+
+        userRepositoryImpl.addFriend(newUser1.getId(), newUser2.getId());
+
+        assertTrue(userRepositoryImpl.findFriendsById(newUser1.getId()).contains(newUser2));
+        //assertTrue(userRepositoryImpl.findFriendsIdsById(newUser2.getId()).contains(newUser1.getId()));
+
+        userRepositoryImpl.removeFriend(newUser1.getId(), newUser2.getId());
+
+        assertFalse(userRepositoryImpl.findFriendsById(newUser1.getId()).contains(newUser2));
+        //assertFalse(userRepositoryImpl.findFriendsIdsById(newUser2.getId()).contains(newUser1.getId()));
+    }
+
+    @Test
+    public void testFindUsersFriends() {
+        User newUser1 = new User(1, "user1", "user1@gmail.com", "User1 Name",
+                LocalDate.of(1990, 1, 1));
+        User newUser2 = new User(2, "user2", "user2@gmail.com", "User2 Name",
+                LocalDate.of(1990, 1, 1));
+        User newUser3 = new User(3, "user3", "user3@gmail.com", "User3 Name",
+                LocalDate.of(1990, 1, 1));
+
+        userRepositoryImpl.save(newUser1);
+        userRepositoryImpl.save(newUser2);
+        userRepositoryImpl.save(newUser3);
+
+        userRepositoryImpl.addFriend(newUser1.getId(), newUser2.getId());
+        userRepositoryImpl.addFriend(newUser1.getId(), newUser3.getId());
+
+        List<User> user1friends = userRepositoryImpl.findFriendsById(newUser1.getId());
+        assertEquals(2, user1friends.size());
+        assertTrue(user1friends.contains(newUser2));
+        assertTrue(user1friends.contains(newUser3));
+
+//        List<User> user2friendsIds = userRepositoryImpl.findFriendsById(newUser2.getId());
 //        assertEquals(1, user2friendsIds.size());
 //        assertTrue(user2friendsIds.contains(newUser1.getId()));
 //
-//        List<Integer> user3friendsIds = userRepositoryImpl.findFriendsIdsById(newUser3.getId());
+//        List<User> user3friendsIds = userRepositoryImpl.findFriendsById(newUser3.getId());
 //        assertEquals(1, user3friendsIds.size());
 //        assertTrue(user3friendsIds.contains(newUser1.getId()));
-//    }
-//
-//    @Test
-//    public void testGetCommonFriends() {
-//        User newUser1 = new User(1, "user1", "user1@gmail.com", "User1 Name",
-//                LocalDate.of(1990, 1, 1));
-//        User newUser2 = new User(2, "user2", "user2@gmail.com", "User2 Name",
-//                LocalDate.of(1990, 1, 1));
-//        User newUser3 = new User(3, "user3", "user3@gmail.com", "User3 Name",
-//                LocalDate.of(1990, 1, 1));
-//
-//        userRepositoryImpl.save(newUser1);
-//        userRepositoryImpl.save(newUser2);
-//        userRepositoryImpl.save(newUser3);
-//
-//        userRepositoryImpl.addFriend(newUser1.getId(), newUser2.getId());
-//        userRepositoryImpl.addFriend(newUser1.getId(), newUser3.getId());
-//
-//        List<Integer> commonFriendsUser2User3 = userRepositoryImpl.getCommonFriends(newUser2.getId(), newUser3.getId());
-//        assertEquals(1, commonFriendsUser2User3.size());
-//        assertTrue(commonFriendsUser2User3.contains(newUser1.getId()));
-//
-//        List<Integer> commonFriendsUser1User3 = userRepositoryImpl.getCommonFriends(newUser1.getId(), newUser3.getId());
-//        assertEquals(0, commonFriendsUser1User3.size());
-//
-//        List<Integer> commonFriendsUser1User2 = userRepositoryImpl.getCommonFriends(newUser1.getId(), newUser2.getId());
-//        assertEquals(0, commonFriendsUser1User2.size());
-//    }
+    }
+
+    @Test
+    public void testGetCommonFriends() {
+        User newUser1 = new User(1, "user1", "user1@gmail.com", "User1 Name",
+                LocalDate.of(1990, 1, 1));
+        User newUser2 = new User(2, "user2", "user2@gmail.com", "User2 Name",
+                LocalDate.of(1990, 1, 1));
+        User newUser3 = new User(3, "user3", "user3@gmail.com", "User3 Name",
+                LocalDate.of(1990, 1, 1));
+
+        userRepositoryImpl.save(newUser1);
+        userRepositoryImpl.save(newUser2);
+        userRepositoryImpl.save(newUser3);
+
+        userRepositoryImpl.addFriend(newUser2.getId(), newUser1.getId());
+        userRepositoryImpl.addFriend(newUser3.getId(), newUser1.getId());
+
+        List<User> commonFriendsUser2User3 = userRepositoryImpl.getCommonFriends(newUser2.getId(), newUser3.getId());
+        assertEquals(1, commonFriendsUser2User3.size());
+        assertTrue(commonFriendsUser2User3.contains(newUser1));
+
+        List<User> commonFriendsUser1User3 = userRepositoryImpl.getCommonFriends(newUser1.getId(), newUser3.getId());
+        assertEquals(0, commonFriendsUser1User3.size());
+
+        List<User> commonFriendsUser1User2 = userRepositoryImpl.getCommonFriends(newUser1.getId(), newUser2.getId());
+        assertEquals(0, commonFriendsUser1User2.size());
+    }
 
 }

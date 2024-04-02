@@ -14,6 +14,7 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
+
 @RequiredArgsConstructor
 @Repository
 public class GenreRepositoryImpl implements GenreRepository {
@@ -34,7 +35,7 @@ public class GenreRepositoryImpl implements GenreRepository {
     @Override
     public void saveMany(List<Genre> newGenres) {
         jdbcTemplate.batchUpdate(
-                "insert into GENRES(GENRE_NAME) values (?)",
+                "INSERT INTO GENRES(GENRE_NAME) VALUES (?)",
                 new BatchPreparedStatementSetter() {
                     @Override
                     public void setValues(PreparedStatement ps, int i) throws SQLException {
@@ -62,7 +63,7 @@ public class GenreRepositoryImpl implements GenreRepository {
     @Override
     public Genre findByID(Integer genreID) {
         List<Genre> genres = jdbcTemplate.query(
-                "select * from GENRES where genre_id = ? order by genre_id",
+                "SELECT * FROM GENRES WHERE GENRE_ID = ? ORDER BY GENRE_ID",
                 genreRowMapper(),
                 genreID);
 
@@ -90,7 +91,7 @@ public class GenreRepositoryImpl implements GenreRepository {
 
     @Override
     public Integer findIdByName(String name) {
-        String sql = "SELECT genre_id FROM genres WHERE genre_name = ?";
+        String sql = "SELECT GENRE_ID FROM GENRES WHERE GENRE_NAME = ?";
         List<Integer> genreIds = jdbcTemplate.queryForList(sql, Integer.class, name);
 
         if (!genreIds.isEmpty()) {
@@ -103,21 +104,21 @@ public class GenreRepositoryImpl implements GenreRepository {
     @Override
     public List<Genre> findAll() {
         return jdbcTemplate.query(
-                "select * from GENRES ORDER BY GENRE_ID",
+                "SELECT * FROM GENRES ORDER BY GENRE_ID",
                 genreRowMapper());
     }
 
 
     @Override
     public boolean deleteById(Integer genreID) {
-        String sqlQuery = "delete from GENRES where genre_id = ?";
+        String sqlQuery = "DELETE FROM GENRES WHERE GENRE_ID = ?";
 
         return jdbcTemplate.update(sqlQuery, genreID) > 0;
     }
 
     @Override
     public boolean deleteAll() {
-        String sqlQuery = "delete from GENRES";
+        String sqlQuery = "DELETE FROM GENRES";
 
         return jdbcTemplate.update(sqlQuery) > 0;
     }
@@ -146,9 +147,9 @@ public class GenreRepositoryImpl implements GenreRepository {
 
     @Override
     public List<Genre> findGenresForFilm(Integer filmId) {
-        String sqlQuery = "select distinct G.GENRE_ID, G.GENRE_NAME from FILM_GENRE AS FG " +
-                "left join GENRES AS G ON FG.GENRE_ID = G.GENRE_ID " +
-                "where FILM_ID = ?";
+        String sqlQuery = "SELECT DISTINCT G.GENRE_ID, G.GENRE_NAME FROM FILM_GENRE AS FG " +
+                "LEFT JOIN GENRES AS G ON FG.GENRE_ID = G.GENRE_ID " +
+                "WHERE FILM_ID = ?";
 
         List<Genre> genres = jdbcTemplate.query(sqlQuery, genreRowMapper(), filmId);
 

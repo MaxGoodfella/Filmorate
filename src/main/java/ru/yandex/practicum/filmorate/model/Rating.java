@@ -5,7 +5,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
-import java.io.Serializable;
 
 
 @Data
@@ -17,6 +16,7 @@ public class Rating {
 
     @NotBlank
     private String name;
+
 
     public Rating setId(Integer id) {
         this.id = id;

@@ -44,57 +44,6 @@ public class Film {
     private List<Genre> genres;
 
 
-//    public Film(String name, String description, LocalDate releaseDate, int duration, Rating mpa, Integer popularity) {
-//        this.name = name;
-//        this.description = description;
-//        this.releaseDate = releaseDate;
-//        this.duration = duration;
-//        this.mpa = mpa;
-//        this.popularity = popularity;
-//    }
-//
-//
-//    public Film(String name, String description, LocalDate releaseDate, int duration, Integer popularity) {
-//        this.name = name;
-//        this.description = description;
-//        this.releaseDate = releaseDate;
-//        this.duration = duration;
-//        this.popularity = popularity;
-//    }
-//
-//    public Film(Integer id, String name, String description, LocalDate releaseDate, int duration, Integer popularity) {
-//        this.id = id;
-//        this.name = name;
-//        this.description = description;
-//        this.releaseDate = releaseDate;
-//        this.duration = duration;
-//        this.popularity = popularity;
-//    }
-
-//    public Film(String name, String description, LocalDate releaseDate, int duration, Rating mpa) {
-//        this.name = name;
-//        this.description = description;
-//        this.releaseDate = releaseDate;
-//        this.duration = duration;
-//        this.mpa = mpa;
-//    }
-//
-//
-//    public Film(String name, String description, LocalDate releaseDate, int duration) {
-//        this.name = name;
-//        this.description = description;
-//        this.releaseDate = releaseDate;
-//        this.duration = duration;
-//    }
-//
-//    public Film(Integer id, String name, String description, LocalDate releaseDate, int duration) {
-//        this.id = id;
-//        this.name = name;
-//        this.description = description;
-//        this.releaseDate = releaseDate;
-//        this.duration = duration;
-//    }
-
     public Film(String name, String description, LocalDate releaseDate, int duration, Rating mpa, Integer popularity,
                 List<Genre> genres) {
         this.name = name;
@@ -109,6 +58,15 @@ public class Film {
     public Film(Integer id, String name, String description, LocalDate releaseDate, int duration, Rating mpa,
                 Integer popularity) {
         this.id = id;
+        this.name = name;
+        this.description = description;
+        this.releaseDate = releaseDate;
+        this.duration = duration;
+        this.mpa = mpa;
+        this.popularity = popularity;
+    }
+
+    public Film(String name, String description, LocalDate releaseDate, int duration, Rating mpa, Integer popularity) {
         this.name = name;
         this.description = description;
         this.releaseDate = releaseDate;

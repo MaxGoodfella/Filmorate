@@ -20,6 +20,7 @@ public class RatingController {
 
     private RatingService ratingService;
 
+
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public Rating save(@Valid @RequestBody Rating newRating) {
         log.info("Start saving rating {}", newRating);

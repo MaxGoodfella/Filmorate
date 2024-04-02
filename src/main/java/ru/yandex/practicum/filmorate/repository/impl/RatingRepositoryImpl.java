@@ -14,6 +14,7 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
+
 @RequiredArgsConstructor
 @Repository
 public class RatingRepositoryImpl implements RatingRepository {
@@ -34,7 +35,7 @@ public class RatingRepositoryImpl implements RatingRepository {
     @Override
     public void saveMany(List<Rating> newRatings) {
         jdbcTemplate.batchUpdate(
-                "insert into FILM_RATING(RATING_NAME) values (?)",
+                "INSERT INTO FILM_RATING(RATING_NAME) VALUES (?)",
                 new BatchPreparedStatementSetter() {
                     @Override
                     public void setValues(PreparedStatement ps, int i) throws SQLException {
@@ -52,7 +53,7 @@ public class RatingRepositoryImpl implements RatingRepository {
 
     @Override
     public boolean update(Rating rating) {
-        String sqlQuery = "update FILM_RATING set RATING_NAME = ? where RATING_ID = ?";
+        String sqlQuery = "UPDATE FILM_RATING SET RATING_NAME = ? WHERE RATING_ID = ?";
         int rowsAffected = jdbcTemplate.update(sqlQuery, rating.getName(), rating.getId());
 
         return rowsAffected > 0;
@@ -62,7 +63,7 @@ public class RatingRepositoryImpl implements RatingRepository {
     @Override
     public Rating findByID(Integer ratingID) {
         List<Rating> ratings = jdbcTemplate.query(
-                "select * from FILM_RATING where rating_id = ? order by rating_id",
+                "SELECT * FROM FILM_RATING WHERE RATING_ID = ? ORDER BY RATING_ID",
                 ratingRowMapper(),
                 ratingID);
 
@@ -76,9 +77,9 @@ public class RatingRepositoryImpl implements RatingRepository {
     @Override
     public Rating findByFilmId(Integer filmId) {
 
-        String sqlQuery = "SELECT * FROM FILM_RATING as fr " +
-                "JOIN FILMS as f ON f.rating_id = fr.rating_id " +
-                "WHERE f.film_id = ?";
+        String sqlQuery = "SELECT * FROM FILM_RATING AS FR " +
+                "JOIN FILMS AS F ON F.rating_id = FR.RATING_ID " +
+                "WHERE F.FILM_ID = ?";
 
         List<Rating> ratings = jdbcTemplate.query(
                 sqlQuery,
@@ -109,7 +110,7 @@ public class RatingRepositoryImpl implements RatingRepository {
 
     @Override
     public Integer findIdByName(String name) {
-        String sql = "SELECT rating_id FROM FILM_RATING WHERE rating_name = ?";
+        String sql = "SELECT RATING_ID FROM FILM_RATING WHERE RATING_NAME = ?";
         List<Integer> ratingIds = jdbcTemplate.queryForList(sql, Integer.class, name);
 
         if (!ratingIds.isEmpty()) {
@@ -122,21 +123,21 @@ public class RatingRepositoryImpl implements RatingRepository {
     @Override
     public List<Rating> findAll() {
         return jdbcTemplate.query(
-                "select * from FILM_RATING ORDER BY RATING_ID",
+                "SELECT * FROM FILM_RATING ORDER BY RATING_ID",
                 ratingRowMapper());
     }
 
 
     @Override
     public boolean deleteById(Integer ratingID) {
-        String sqlQuery = "delete from FILM_RATING where rating_id = ?";
+        String sqlQuery = "DELETE FROM FILM_RATING WHERE RATING_ID = ?";
 
         return jdbcTemplate.update(sqlQuery, ratingID) > 0;
     }
 
     @Override
     public boolean deleteAll() {
-        String sqlQuery = "delete from FILM_RATING";
+        String sqlQuery = "DELETE FROM FILM_RATING";
 
         return jdbcTemplate.update(sqlQuery) > 0;
     }

@@ -1,13 +1,11 @@
 package ru.yandex.practicum.filmorate.tests;
 
 import lombok.RequiredArgsConstructor;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
 import org.springframework.dao.DuplicateKeyException;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import ru.yandex.practicum.filmorate.model.Rating;
 import ru.yandex.practicum.filmorate.repository.impl.RatingRepositoryImpl;
@@ -30,13 +28,8 @@ public class RatingRepositoryImplTest {
     @BeforeEach
     public void setUp() {
         ratingRepositoryImpl = new RatingRepositoryImpl(jdbcTemplate);
-    }
-
-    @AfterEach
-    public void tearDown() {
         jdbcTemplate.execute("DELETE FROM FILM_RATING");
     }
-
 
     @Test
     public void testFindRatingByExistingId() {
@@ -56,7 +49,7 @@ public class RatingRepositoryImplTest {
         Rating newRating = new Rating(1, "PG13");
         ratingRepositoryImpl.save(newRating);
 
-        assertThrows(EmptyResultDataAccessException.class, () -> ratingRepositoryImpl.findByID(2));
+        assertNull(ratingRepositoryImpl.findByID(2));
     }
 
     @Test
@@ -170,7 +163,7 @@ public class RatingRepositoryImplTest {
         Rating savedRating = ratingRepositoryImpl.save(newRating);
 
         assertDoesNotThrow(() -> ratingRepositoryImpl.deleteById(savedRating.getId()));
-        assertThrows(EmptyResultDataAccessException.class, () -> ratingRepositoryImpl.findByID(1));
+        assertNull(ratingRepositoryImpl.findByID(1));
     }
 
     @Test

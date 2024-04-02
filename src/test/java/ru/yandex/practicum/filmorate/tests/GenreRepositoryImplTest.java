@@ -1,17 +1,20 @@
 package ru.yandex.practicum.filmorate.tests;
 
 import lombok.RequiredArgsConstructor;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
 import org.springframework.dao.DuplicateKeyException;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.model.Rating;
+import ru.yandex.practicum.filmorate.repository.impl.FilmRepositoryImpl;
 import ru.yandex.practicum.filmorate.repository.impl.GenreRepositoryImpl;
+import ru.yandex.practicum.filmorate.repository.impl.RatingRepositoryImpl;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,12 +33,9 @@ public class GenreRepositoryImplTest {
     @BeforeEach
     public void setUp() {
         genreRepositoryImpl = new GenreRepositoryImpl(jdbcTemplate);
-    }
-
-    @AfterEach
-    public void tearDown() {
         jdbcTemplate.execute("DELETE FROM GENRES");
     }
+
 
 
     @Test
@@ -56,7 +56,7 @@ public class GenreRepositoryImplTest {
         Genre newGenre = new Genre(1, "Comedy");
         genreRepositoryImpl.save(newGenre);
 
-        assertThrows(EmptyResultDataAccessException.class, () -> genreRepositoryImpl.findByID(2));
+        assertNull(genreRepositoryImpl.findByID(2));
     }
 
     @Test
@@ -168,7 +168,7 @@ public class GenreRepositoryImplTest {
         Genre savedGenre = genreRepositoryImpl.save(newGenre);
 
         assertDoesNotThrow(() -> genreRepositoryImpl.deleteById(savedGenre.getId()));
-        assertThrows(EmptyResultDataAccessException.class, () -> genreRepositoryImpl.findByID(1));
+        assertNull(genreRepositoryImpl.findByID(1));
     }
 
     @Test
@@ -191,6 +191,59 @@ public class GenreRepositoryImplTest {
         genreRepositoryImpl.save(newGenre3);
 
         assertDoesNotThrow(() -> genreRepositoryImpl.deleteAll());
+    }
+
+    @Test
+    public void testAdd() {
+
+        RatingRepositoryImpl ratingRepositoryImpl = new RatingRepositoryImpl(jdbcTemplate);
+
+        Rating newRating1 = new Rating(1, "PG13");
+        Rating newRating2 = new Rating(2, "PG17");
+        Rating savedRating1 = ratingRepositoryImpl.save(newRating1);
+        Rating savedRating2 = ratingRepositoryImpl.save(newRating2);
+
+        Genre newGenre1 = new Genre(1, "Comedy");
+        Genre newGenre2 = new Genre(2, "Drama");
+        Genre newGenre3 = new Genre(3, "Thriller");
+
+        Genre savedGenre1 = genreRepositoryImpl.save(newGenre1);
+        Genre savedGenre2 = genreRepositoryImpl.save(newGenre2);
+        Genre savedGenre3 = genreRepositoryImpl.save(newGenre3);
+
+        List<Genre> film1Genres = new ArrayList<>();
+        film1Genres.add(savedGenre1);
+        film1Genres.add(savedGenre2);
+        film1Genres.add(savedGenre3);
+
+        List<Genre> film2Genres = new ArrayList<>();
+        film2Genres.add(savedGenre1);
+        film2Genres.add(savedGenre2);
+
+
+        FilmRepositoryImpl filmRepositoryImpl = new FilmRepositoryImpl
+                (jdbcTemplate, ratingRepositoryImpl, genreRepositoryImpl);
+
+        Film newFilm1 = new Film("Name1", "Description2",
+                LocalDate.of(1990, 12, 12), 100, savedRating1, 0);
+        Film newFilm2 = new Film("Name2", "Description2",
+                LocalDate.of(1990, 12, 12), 100, savedRating2, 0);
+
+        Film savedFilm1 = filmRepositoryImpl.save(newFilm1);
+        Film savedFilm2 = filmRepositoryImpl.save(newFilm2);
+
+
+        genreRepositoryImpl.add(savedFilm1.getId(), film1Genres);
+        genreRepositoryImpl.add(savedFilm2.getId(), film2Genres);
+
+        assertEquals(3, genreRepositoryImpl.findGenresForFilm(savedFilm1.getId()).size());
+        assertTrue(genreRepositoryImpl.findGenresForFilm(savedFilm1.getId()).contains(savedGenre1));
+        assertTrue(genreRepositoryImpl.findGenresForFilm(savedFilm1.getId()).contains(savedGenre2));
+        assertTrue(genreRepositoryImpl.findGenresForFilm(savedFilm1.getId()).contains(savedGenre3));
+        assertEquals(2, genreRepositoryImpl.findGenresForFilm(savedFilm2.getId()).size());
+        assertTrue(genreRepositoryImpl.findGenresForFilm(savedFilm2.getId()).contains(savedGenre1));
+        assertTrue(genreRepositoryImpl.findGenresForFilm(savedFilm2.getId()).contains(savedGenre2));
+
     }
 
 }

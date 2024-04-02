@@ -168,8 +168,10 @@ public class UserServiceImpl implements UserService {
             throw new EntityNotFoundException(User.class, "Friend with id = " + friendId + " hasn't been found");
         }
 
-        // оставляю то, что ниже, так как на мой взгляд это странно, что у нас есть возможность удалить "друга",
-        // которого нет на самом деле в друзьях
+        /**
+         * оставляю то, что ниже, так как на мой взгляд это странно, что у нас есть возможность удалить "друга",
+         * которого на самом деле и нет в друзьях, но постман тесты думают иначе)
+         */
 
 //        if (!usersFriendsIds.contains(friendId)) {
 //            throw new EntityNotFoundException(Integer.class, "Friend with id = " + friendId +
@@ -199,6 +201,7 @@ public class UserServiceImpl implements UserService {
         }
 
         return userRepository.getCommonFriends(user1ID, user2ID);
+
     }
 
 
