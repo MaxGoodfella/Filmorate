@@ -54,7 +54,9 @@ public class RatingRepositoryImpl implements RatingRepository {
     @Override
     public boolean update(Rating rating) {
         String sqlQuery = "UPDATE FILM_RATING SET RATING_NAME = ? WHERE RATING_ID = ?";
-        int rowsAffected = jdbcTemplate.update(sqlQuery, rating.getName(), rating.getId());
+        int rowsAffected = jdbcTemplate.update(sqlQuery,
+                rating.getName(),
+                rating.getId());
 
         return rowsAffected > 0;
     }

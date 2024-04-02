@@ -115,14 +115,14 @@ public class FilmRepositoryImpl implements FilmRepository {
         String sqlQuery = "UPDATE FILMS SET NAME = ?, DESCRIPTION = ?, RELEASE_DATE = ?, DURATION = ?, " +
                 "RATING_ID = ?, POPULARITY = ? WHERE FILM_ID = ?";
 
-        int rowsAffected = jdbcTemplate.update(sqlQuery
-                , film.getName()
-                , film.getDescription()
-                , film.getReleaseDate()
-                , film.getDuration()
-                , film.getMpa().getId()
-                , film.getPopularity()
-                , film.getId());
+        int rowsAffected = jdbcTemplate.update(sqlQuery,
+                film.getName(),
+                film.getDescription(),
+                film.getReleaseDate(),
+                film.getDuration(),
+                film.getMpa().getId(),
+                film.getPopularity(),
+                film.getId());
 
         return rowsAffected > 0;
     }
@@ -148,7 +148,6 @@ public class FilmRepositoryImpl implements FilmRepository {
     public Integer findIdByName(String name) {
         String sql = "SELECT FILM_ID FROM FILMS WHERE NAME = ?";
         List<Integer> filmIds = jdbcTemplate.queryForList(sql, Integer.class, name);
-        
         if (!filmIds.isEmpty()) {
             return filmIds.get(0);
         } else {

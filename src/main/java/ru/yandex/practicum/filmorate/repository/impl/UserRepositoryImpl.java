@@ -66,12 +66,12 @@ public class UserRepositoryImpl implements UserRepository {
         String sqlQuery = "UPDATE USERS SET NAME = ?, EMAIL = ?, LOGIN = ?, DATE_OF_BIRTH = ? " +
                 "WHERE USER_ID = ?";
 
-        int rowsAffected = jdbcTemplate.update(sqlQuery
-                , user.getName()
-                , user.getEmail()
-                , user.getLogin()
-                , user.getBirthday()
-                , user.getId());
+        int rowsAffected = jdbcTemplate.update(sqlQuery,
+                user.getName(),
+                user.getEmail(),
+                user.getLogin(),
+                user.getBirthday(),
+                user.getId());
 
         return rowsAffected > 0;
     }

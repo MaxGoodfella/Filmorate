@@ -54,7 +54,9 @@ public class GenreRepositoryImpl implements GenreRepository {
     @Override
     public boolean update(Genre genre) {
         String sqlQuery = "UPDATE GENRES SET GENRE_NAME = ? WHERE GENRE_ID = ?";
-        int rowsAffected = jdbcTemplate.update(sqlQuery, genre.getName(), genre.getId());
+        int rowsAffected = jdbcTemplate.update(sqlQuery,
+                genre.getName(),
+                genre.getId());
 
         return rowsAffected > 0;
     }
