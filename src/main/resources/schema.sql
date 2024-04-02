@@ -15,9 +15,8 @@ create table IF NOT EXISTS FILMS
     DESCRIPTION  CHARACTER VARYING(200) not null,
     RELEASE_DATE DATE                   not null,
     DURATION     INTEGER                not null,
-    --RATING_ID    INTEGER                not null,
     RATING_ID    INTEGER,
-    --POPULARITY   INTEGER,
+    POPULARITY   INTEGER,
     constraint FILMS_PK
         primary key (FILM_ID)
         ,

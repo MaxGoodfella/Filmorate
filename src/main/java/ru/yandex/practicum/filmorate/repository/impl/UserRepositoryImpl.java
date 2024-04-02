@@ -142,7 +142,7 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public List<User> findAll() {
        return jdbcTemplate.query(
-               "select * from USERS",
+               "select * from USERS ORDER BY USER_ID",
                userRowMapper());
     }
 

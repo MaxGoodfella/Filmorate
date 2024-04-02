@@ -39,7 +39,7 @@ public class Film {
     @NotNull
     private Rating mpa;
 
-    // private Integer popularity;
+    private Integer popularity;
 
     private List<Genre> genres;
 
@@ -95,26 +95,26 @@ public class Film {
 //        this.duration = duration;
 //    }
 
-    public Film(String name, String description, LocalDate releaseDate, int duration, Rating mpa, List<Genre> genres) {
+    public Film(String name, String description, LocalDate releaseDate, int duration, Rating mpa, Integer popularity,
+                List<Genre> genres) {
         this.name = name;
         this.description = description;
         this.releaseDate = releaseDate;
         this.duration = duration;
         this.mpa = mpa;
+        this.popularity = popularity;
         this.genres = genres;
     }
 
-    public Film(Integer id, String name, String description, LocalDate releaseDate, int duration, Rating mpa) {
+    public Film(Integer id, String name, String description, LocalDate releaseDate, int duration, Rating mpa,
+                Integer popularity) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.releaseDate = releaseDate;
         this.duration = duration;
         this.mpa = mpa;
+        this.popularity = popularity;
     }
-
-    //    public void addGenre(Genre genre) {
-//        genres.add(genre);
-//    }
 
 }

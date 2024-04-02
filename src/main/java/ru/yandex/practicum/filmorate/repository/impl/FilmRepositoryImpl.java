@@ -291,11 +291,11 @@ public class FilmRepositoryImpl implements FilmRepository {
                 filmId,
                 userId);
 
-//        String sqlQuery2 = "UPDATE FILMS SET POPULARITY = " +
-//                "(SELECT COUNT(*) FROM FILM_FANS WHERE FILM_ID = ?) " +
-//                "WHERE FILM_ID = ?";
-//
-//        jdbcTemplate.update(sqlQuery2, filmId, filmId);
+        String sqlQuery2 = "UPDATE FILMS SET POPULARITY = " +
+                "(SELECT COUNT(*) FROM FILM_FANS WHERE FILM_ID = ?) " +
+                "WHERE FILM_ID = ?";
+
+        jdbcTemplate.update(sqlQuery2, filmId, filmId);
     }
 
     @Override
@@ -304,37 +304,37 @@ public class FilmRepositoryImpl implements FilmRepository {
 
         int rowsDeleted = jdbcTemplate.update(sqlQuery, filmId, userId);
 
-        return rowsDeleted > 0;
+        // return rowsDeleted > 0;
 
-//        if (rowsDeleted > 0) {
-//            String sqlQuery2 = "UPDATE FILMS SET POPULARITY = (SELECT COUNT(*) FROM FILM_FANS WHERE FILM_ID = ?) WHERE FILM_ID = ?";
-//            jdbcTemplate.update(sqlQuery2, filmId, filmId);
-//            return true;
-//        } else {
-//            return false;
-//        }
+        if (rowsDeleted > 0) {
+            String sqlQuery2 = "UPDATE FILMS SET POPULARITY = (SELECT COUNT(*) FROM FILM_FANS WHERE FILM_ID = ?) WHERE FILM_ID = ?";
+            jdbcTemplate.update(sqlQuery2, filmId, filmId);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    @Override
+    public List<Film> getTopByLikes(Integer count) {
+        String sqlQuery = "SELECT * FROM FILMS ORDER BY popularity DESC LIMIT ?";
+
+        return jdbcTemplate.query(sqlQuery, filmRowMapper(), count);
     }
 
 //    @Override
 //    public List<Film> getTopByLikes(Integer count) {
-//        String sqlQuery = "SELECT * FROM FILMS ORDER BY popularity DESC LIMIT ?";
+//        //String sqlQuery = "SELECT * FROM FILMS ORDER BY popularity DESC LIMIT ?";
+//
+//        String sqlQuery = "SELECT f.* " +
+//                          "FROM FILMS AS f " +
+//                          "JOIN FILM_FANS AS ff ON f.FILM_ID = ff.FILM_ID " +
+//                          "GROUP BY ff.FILM_ID " +
+//                          "ORDER BY COUNT(ff.USER_ID) DESC " +
+//                          "LIMIT ?";
 //
 //        return jdbcTemplate.query(sqlQuery, filmRowMapper(), count);
 //    }
-
-    @Override
-    public List<Film> getTopByLikes(Integer count) {
-        //String sqlQuery = "SELECT * FROM FILMS ORDER BY popularity DESC LIMIT ?";
-
-        String sqlQuery = "SELECT f.* " +
-                          "FROM FILMS AS f " +
-                          "JOIN FILM_FANS AS ff ON f.FILM_ID = ff.FILM_ID " +
-                          "GROUP BY ff.FILM_ID " +
-                          "ORDER BY COUNT(ff.USER_ID) DESC " +
-                          "LIMIT ?";
-
-        return jdbcTemplate.query(sqlQuery, filmRowMapper(), count);
-    }
 
     @Override
     public List<Integer> findFansIds(Integer filmId) {
@@ -494,7 +494,7 @@ public class FilmRepositoryImpl implements FilmRepository {
         values.put("release_date", film.getReleaseDate());
         values.put("duration", film.getDuration());
         values.put("rating_id", film.getMpa().getId());
-        //values.put("popularity", film.getPopularity());
+        values.put("popularity", film.getPopularity());
 
         return values;
     }
@@ -508,7 +508,7 @@ public class FilmRepositoryImpl implements FilmRepository {
                 rs.getDate("release_date").toLocalDate(),
                 rs.getInt("duration"),
                 ratingRepository.findByID(rs.getInt("rating_id")),
-                //rs.getInt("popularity"),
+                rs.getInt("popularity"),
                 genreRepository.findGenresForFilm(rs.getInt("film_id")));
     }
 
