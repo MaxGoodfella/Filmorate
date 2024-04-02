@@ -134,8 +134,8 @@ public class FilmRepositoryImplTest {
 
         Film savedFilm = filmRepositoryImpl.save(newFilm);
 
-        assertDoesNotThrow(() -> filmRepositoryImpl.findByNameDescriptionReleaseDateAndDuration
-                (savedFilm.getName(), savedFilm.getDescription(), savedFilm.getReleaseDate(), savedFilm.getDuration()));
+        assertDoesNotThrow(() -> filmRepositoryImpl.findByNameDescriptionReleaseDateAndDuration(savedFilm.getName(),
+                savedFilm.getDescription(), savedFilm.getReleaseDate(), savedFilm.getDuration()));
 
         assertThat(savedFilm)
                 .isNotNull()
@@ -149,9 +149,8 @@ public class FilmRepositoryImplTest {
                 LocalDate.of(1990, 12, 12), 100, savedRating1, 0);
         filmRepositoryImpl.save(newFilm);
 
-        assertNull(filmRepositoryImpl.findByNameDescriptionReleaseDateAndDuration
-                ("Name2", "Description2", LocalDate.of(1991, 12, 12),
-                        1001));
+        assertNull(filmRepositoryImpl.findByNameDescriptionReleaseDateAndDuration("Name2",
+                "Description2", LocalDate.of(1991, 12, 12), 1001));
     }
 
     @Test
