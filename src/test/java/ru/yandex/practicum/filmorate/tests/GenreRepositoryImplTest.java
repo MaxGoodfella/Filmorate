@@ -221,8 +221,8 @@ public class GenreRepositoryImplTest {
         film2Genres.add(savedGenre2);
 
 
-        FilmRepositoryImpl filmRepositoryImpl = new FilmRepositoryImpl
-                (jdbcTemplate, ratingRepositoryImpl, genreRepositoryImpl);
+        FilmRepositoryImpl filmRepositoryImpl = new FilmRepositoryImpl(jdbcTemplate,
+                ratingRepositoryImpl, genreRepositoryImpl);
 
         Film newFilm1 = new Film("Name1", "Description2",
                 LocalDate.of(1990, 12, 12), 100, savedRating1, 0);
