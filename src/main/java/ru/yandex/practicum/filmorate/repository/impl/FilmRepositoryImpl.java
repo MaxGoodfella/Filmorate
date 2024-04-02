@@ -97,7 +97,6 @@ public class FilmRepositoryImpl implements FilmRepository {
         film.setId(newFilmId.intValue());
 
 
-
         List<Genre> genres = film.getGenres();
         if (genres != null) {
             Set<Integer> genreIds = new HashSet<>();

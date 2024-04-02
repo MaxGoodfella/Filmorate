@@ -9,8 +9,10 @@ import ru.yandex.practicum.filmorate.exceptions.EntityAlreadyExistsException;
 import ru.yandex.practicum.filmorate.exceptions.EntityNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.model.Rating;
 import ru.yandex.practicum.filmorate.repository.FilmRepository;
 import ru.yandex.practicum.filmorate.repository.GenreRepository;
+import ru.yandex.practicum.filmorate.repository.RatingRepository;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
 import java.util.ArrayList;
@@ -25,6 +27,8 @@ public class FilmServiceImpl implements FilmService {
 
     private GenreRepository genreRepository;
 
+    private RatingRepository ratingRepository;
+
 //        Film existingFilm = filmRepository.findByNameDescriptionReleaseDateAndDuration(
 //                newFilm.getName(), newFilm.getDescription(), newFilm.getReleaseDate(), newFilm.getDuration());
 //
@@ -37,23 +41,59 @@ public class FilmServiceImpl implements FilmService {
 //
 //        return filmRepository.save(newFilm);
 
+//    @Override
+//    public Film save(Film newFilm) {
+//
+//
+//        Film existingFilm = filmRepository.findByNameDescriptionReleaseDateAndDuration(
+//                newFilm.getName(), newFilm.getDescription(), newFilm.getReleaseDate(), newFilm.getDuration());
+//
+//        if (existingFilm != null) {
+//
+//            // использовать метод нахождения рейтинга по filmid
+//
+////            Rating existingRating = ratingRepository.findByFilmId(existingFilm.getId());
+////
+////            if (existingRating != null) {
+////                throw new EntityAlreadyExistsException(Film.class, "Фильм с такими параметрами уже существует");
+////            }
+//
+//            List<Genre> existingGenres = genreRepository.findGenresForFilm(existingFilm.getId());
+//            if (existingGenres != null) {
+//                throw new EntityAlreadyExistsException(Film.class, "Фильм с такими параметрами уже существует");
+//            }
+//        }
+//
+//        return filmRepository.save(newFilm);
+//
+//    }
+
+
     @Override
     public Film save(Film newFilm) {
-
-
         Film existingFilm = filmRepository.findByNameDescriptionReleaseDateAndDuration(
                 newFilm.getName(), newFilm.getDescription(), newFilm.getReleaseDate(), newFilm.getDuration());
 
         if (existingFilm != null) {
-            List<Genre> existingGenres = genreRepository.findGenresForFilm(existingFilm.getId());
-            if (existingGenres != null) {
-                throw new EntityAlreadyExistsException(Film.class, "Фильм с такими параметрами уже существует");
+            Rating existingRating = ratingRepository.findByFilmId(existingFilm.getId());
+            if (existingRating != null && existingRating.getId() == newFilm.getMpa().getId()) {
+                List<Genre> existingGenres = genreRepository.findGenresForFilm(existingFilm.getId());
+                if (existingGenres != null) {
+                    for (Genre existingGenre : existingGenres) {
+                        for (Genre newGenre : newFilm.getGenres()) {
+                            if (existingGenre.getId().equals(newGenre.getId())) {
+                                throw new EntityAlreadyExistsException(Film.class, "Фильм с такими параметрами уже существует");
+                            }
+                        }
+                    }
+                }
             }
         }
 
         return filmRepository.save(newFilm);
-
     }
+
+
 
 //    @Override
 //    public void saveMany(List<Film> newFilms) {

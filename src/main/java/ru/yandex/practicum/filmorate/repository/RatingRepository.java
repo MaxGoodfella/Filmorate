@@ -16,6 +16,8 @@ public interface RatingRepository {
 
     Rating findByID(Integer ratingID);
 
+    Rating findByFilmId(Integer filmId);
+
     Rating findByName(String ratingName);
 
     Integer findIdByName(String name);

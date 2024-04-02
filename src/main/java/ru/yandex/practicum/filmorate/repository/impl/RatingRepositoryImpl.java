@@ -74,6 +74,25 @@ public class RatingRepositoryImpl implements RatingRepository {
     }
 
     @Override
+    public Rating findByFilmId(Integer filmId) {
+
+        String sqlQuery = "SELECT * FROM FILM_RATING as fr " +
+                "JOIN FILMS as f ON f.rating_id = fr.rating_id " +
+                "WHERE f.film_id = ?";
+
+        List<Rating> ratings = jdbcTemplate.query(
+                sqlQuery,
+                ratingRowMapper(),
+                filmId);
+
+        if (ratings.isEmpty()) {
+            return null;
+        } else {
+            return ratings.get(0);
+        }
+    }
+
+    @Override
     public Rating findByName(String ratingName) {
         List<Rating> ratings = jdbcTemplate.query(
                 "SELECT * FROM FILM_RATING WHERE RATING_NAME = ?",
