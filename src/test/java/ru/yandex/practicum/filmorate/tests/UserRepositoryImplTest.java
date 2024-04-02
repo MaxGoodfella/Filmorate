@@ -217,7 +217,7 @@ public class UserRepositoryImplTest {
 
         assertThrows(DuplicateKeyException.class, () -> userRepositoryImpl.save(newUser2));
     }
-    
+
     @Test
     public void testSaveMany() {
         User newUser1 = new User(1, "user1", "user1@gmail.com", "User1 Name",
@@ -269,7 +269,6 @@ public class UserRepositoryImplTest {
 
         assertThrows(DuplicateKeyException.class, () -> userRepositoryImpl.saveMany(newUsers));
     }
-    
 
     @Test
     public void testUpdate() {
