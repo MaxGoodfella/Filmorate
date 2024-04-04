@@ -9,7 +9,6 @@ import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.repository.RatingRepository;
 import ru.yandex.practicum.filmorate.service.RatingService;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @AllArgsConstructor
@@ -29,26 +28,6 @@ public class RatingServiceImpl implements RatingService {
         }
 
         return ratingRepository.save(rating);
-    }
-
-    @Override
-    public void saveMany(List<Rating> newRatings) {
-        List<Rating> existingRatings = new ArrayList<>();
-        List<Rating> newRatingsToSave = new ArrayList<>();
-
-        for (Rating newRating : newRatings) {
-            Integer existingRatingId = ratingRepository.findIdByName(newRating.getName());
-            if (existingRatingId != null) {
-                newRating.setId(existingRatingId);
-                existingRatings.add(newRating);
-            } else {
-                newRatingsToSave.add(newRating);
-            }
-        }
-
-        if (!newRatingsToSave.isEmpty()) {
-            ratingRepository.saveMany(newRatingsToSave);
-        }
     }
 
     @Override

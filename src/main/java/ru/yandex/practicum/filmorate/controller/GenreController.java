@@ -29,13 +29,6 @@ public class GenreController {
         return savedGenre;
     }
 
-    @PostMapping(value = "/multiple", produces = MediaType.APPLICATION_JSON_VALUE)
-    public void saveMany(@Valid @RequestBody List<Genre> newGenres) {
-        log.info("Start saving genres {}", newGenres);
-        genreService.saveMany(newGenres);
-        log.info("Finish saving genres {}", newGenres);
-    }
-
     @PutMapping
     public void update(@Valid @RequestBody Genre genre) {
         log.info("Start updating genre {}", genre);

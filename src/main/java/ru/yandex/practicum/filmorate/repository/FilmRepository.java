@@ -9,8 +9,6 @@ public interface FilmRepository {
 
     Film save(Film newFilm);
 
-    void saveMany(List<Film> newFilms);
-
     boolean update(Film film);
 
     Film findById(Integer id);

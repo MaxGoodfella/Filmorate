@@ -8,8 +8,6 @@ public interface FilmService {
 
     Film save(Film newFilm);
 
-    void saveMany(List<Film> newFilms);
-
     Film update(Film film);
 
     Film findById(Integer id);

@@ -2,17 +2,13 @@ package ru.yandex.practicum.filmorate.repository.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
+import ru.yandex.practicum.filmorate.mapper.UserMapper;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.repository.UserRepository;
 
-import java.sql.Date;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
@@ -24,6 +20,8 @@ public class UserRepositoryImpl implements UserRepository {
 
     private final JdbcTemplate jdbcTemplate;
 
+    private final UserMapper userMapper;
+
 
     @Override
     public User save(User user) {
@@ -31,33 +29,12 @@ public class UserRepositoryImpl implements UserRepository {
                 .withTableName("USERS")
                 .usingGeneratedKeyColumns("user_id");
 
-        Map<String, Object> parameters = userToMap(user);
+        Map<String, Object> parameters = userMapper.toMap(user);
         Number newUserId = simpleJdbcInsert.executeAndReturnKey(parameters);
 
         user.setId(newUserId.intValue());
 
         return user;
-    }
-
-    @Override
-    public void saveMany(List<User> newUsers) {
-        jdbcTemplate.batchUpdate(
-                "INSERT INTO USERS(NAME, EMAIL, LOGIN, DATE_OF_BIRTH) VALUES (?, ?, ?, ?)",
-                new BatchPreparedStatementSetter() {
-                    @Override
-                    public void setValues(PreparedStatement ps, int i) throws SQLException {
-                        User user = newUsers.get(i);
-                        ps.setString(1, user.getName());
-                        ps.setString(2, user.getEmail());
-                        ps.setString(3, user.getLogin());
-                        ps.setDate(4, Date.valueOf(user.getBirthday()));
-                    }
-
-                    @Override
-                    public int getBatchSize() {
-                        return newUsers.size();
-                    }
-                });
     }
 
 
@@ -81,7 +58,7 @@ public class UserRepositoryImpl implements UserRepository {
     public User findById(Integer id) {
         List<User> users = jdbcTemplate.query(
                 "SELECT * FROM USERS WHERE USER_ID = ?",
-                userRowMapper(),
+                userMapper,
                 id);
 
         if (users.isEmpty()) {
@@ -95,7 +72,7 @@ public class UserRepositoryImpl implements UserRepository {
     public User findByName(String userName) {
         return jdbcTemplate.queryForObject(
                 "SELECT * FROM USERS WHERE NAME = ?",
-                userRowMapper(),
+                userMapper,
                 userName);
     }
 
@@ -103,7 +80,7 @@ public class UserRepositoryImpl implements UserRepository {
     public User findByEmail(String email) {
         List<User> users = jdbcTemplate.query(
                 "SELECT * FROM USERS WHERE EMAIL = ?",
-                userRowMapper(),
+                userMapper,
                 email);
 
         if (users.isEmpty()) {
@@ -117,7 +94,7 @@ public class UserRepositoryImpl implements UserRepository {
     public User findByLogin(String login) {
         List<User> users = jdbcTemplate.query(
                 "SELECT * FROM USERS WHERE LOGIN = ?",
-                userRowMapper(),
+                userMapper,
                 login);
 
         if (users.isEmpty()) {
@@ -143,7 +120,7 @@ public class UserRepositoryImpl implements UserRepository {
     public List<User> findAll() {
        return jdbcTemplate.query(
                "SELECT * FROM USERS ORDER BY USER_ID",
-               userRowMapper());
+               userMapper);
     }
 
 
@@ -169,14 +146,6 @@ public class UserRepositoryImpl implements UserRepository {
         jdbcTemplate.update(sqlQuery,
                 userId,
                 friendId);
-
-        /**
-         * По идее у нас идёт такая тема, что если один юзер добавляет другого, то они автоматически друзья друг другу,
-         * но зачем-то это логику решили поменять
-         */
-//        jdbcTemplate.update(sqlQuery,
-//                friendId,
-//                userId);
     }
 
     @Override
@@ -196,7 +165,7 @@ public class UserRepositoryImpl implements UserRepository {
                 "WHERE UF.USER_ID = ? " +
                 "ORDER BY U.USER_ID";
 
-        return jdbcTemplate.query(sqlQuery, userRowMapper(), userId);
+        return jdbcTemplate.query(sqlQuery, userMapper, userId);
     }
 
     @Override
@@ -208,26 +177,7 @@ public class UserRepositoryImpl implements UserRepository {
                 "WHERE UF1.USER_ID = ? AND UF2.USER_ID = ? " +
                 "ORDER BY U.USER_ID";
 
-        return jdbcTemplate.query(sqlQuery, userRowMapper(), user1ID, user2ID);
-    }
-
-
-
-    private static RowMapper<User> userRowMapper() {
-        return (rs, rowNum) -> new User(
-                rs.getInt("user_id"),
-                rs.getString("name"),
-                rs.getString("email"),
-                rs.getString("login"),
-                rs.getDate("date_of_birth").toLocalDate());
-    }
-
-    private Map<String, Object> userToMap(User user) {
-        return Map.of(
-                "name", user.getName(),
-                "email", user.getEmail(),
-                "login", user.getLogin(),
-                "date_of_birth", user.getBirthday().toString());
+        return jdbcTemplate.query(sqlQuery, userMapper, user1ID, user2ID);
     }
 
 }

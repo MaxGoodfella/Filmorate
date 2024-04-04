@@ -27,13 +27,6 @@ public class UserController {
         return savedUser;
     }
 
-    @PostMapping(value = "/multiple", produces = MediaType.APPLICATION_JSON_VALUE)
-    public void saveMany(@Valid @RequestBody List<User> newUsers) {
-        log.info("Start saving users {}", newUsers);
-        userService.saveMany(newUsers);
-        log.info("Finish saving users {}", newUsers);
-    }
-
     @PutMapping
     public User update(@Valid @RequestBody User user) {
         log.info("Start updating user {}", user);

@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.core.JdbcTemplate;
+import ru.yandex.practicum.filmorate.mapper.RatingMapper;
 import ru.yandex.practicum.filmorate.model.Rating;
 import ru.yandex.practicum.filmorate.repository.impl.RatingRepositoryImpl;
 
@@ -25,9 +26,13 @@ public class RatingRepositoryImplTest {
 
     private RatingRepositoryImpl ratingRepositoryImpl;
 
+    private static RatingMapper ratingMapper;
+
     @BeforeEach
     public void setUp() {
-        ratingRepositoryImpl = new RatingRepositoryImpl(jdbcTemplate);
+        ratingMapper = new RatingMapper();
+
+        ratingRepositoryImpl = new RatingRepositoryImpl(jdbcTemplate, ratingMapper);
         jdbcTemplate.execute("DELETE FROM FILM_RATING");
     }
 
@@ -131,28 +136,6 @@ public class RatingRepositoryImplTest {
         ratingRepositoryImpl.save(newRating1);
 
         assertThrows(DuplicateKeyException.class, () -> ratingRepositoryImpl.save(newRating2));
-    }
-
-    @Test
-    public void testSaveMany() {
-        Rating newRating1 = new Rating(1, "PG13");
-        Rating newRating2 = new Rating(2, "PG17");
-        List<Rating> newRatings = new ArrayList<>();
-        newRatings.add(newRating1);
-        newRatings.add(newRating2);
-
-        assertDoesNotThrow(() -> ratingRepositoryImpl.saveMany(newRatings));
-    }
-
-    @Test
-    public void testSaveMany_shouldThrowDuplicateKeyException() {
-        Rating newRating1 = new Rating(1, "PG17");
-        Rating newRating2 = new Rating(2, "PG17");
-        List<Rating> newRatings = new ArrayList<>();
-        newRatings.add(newRating1);
-        newRatings.add(newRating2);
-
-        assertThrows(DuplicateKeyException.class, () -> ratingRepositoryImpl.saveMany(newRatings));
     }
 
 

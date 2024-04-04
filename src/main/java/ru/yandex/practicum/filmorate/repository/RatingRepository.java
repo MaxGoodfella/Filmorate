@@ -8,8 +8,6 @@ public interface RatingRepository {
 
     Rating save(Rating newRating);
 
-    void saveMany(List<Rating> newRatings);
-
     boolean update(Rating rating);
 
     List<Rating> findAll();

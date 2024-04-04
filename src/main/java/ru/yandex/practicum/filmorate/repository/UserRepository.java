@@ -8,8 +8,6 @@ public interface UserRepository {
 
     User save(User newUser);
 
-    void saveMany(List<User> newUsers);
-
     boolean update(User user);
 
     User findById(Integer id);

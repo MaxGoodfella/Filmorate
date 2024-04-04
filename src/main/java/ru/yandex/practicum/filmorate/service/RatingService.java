@@ -9,8 +9,6 @@ public interface RatingService {
 
     Rating save(Rating newRating);
 
-    void saveMany(List<Rating> newRatings);
-
     void update(Rating rating);
 
     List<Rating> findAll();

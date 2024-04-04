@@ -32,7 +32,6 @@ public class Film {
     @MinimumDate
     private LocalDate releaseDate;
 
-    @NotNull
     @Positive
     private int duration;
 

@@ -9,8 +9,6 @@ public interface GenreService {
 
     Genre save(Genre newGenre);
 
-    void saveMany(List<Genre> newGenres);
-
     void update(Genre genre);
 
     List<Genre> findAll();

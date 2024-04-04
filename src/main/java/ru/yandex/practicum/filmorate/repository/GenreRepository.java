@@ -8,8 +8,6 @@ public interface GenreRepository {
 
     Genre save(Genre newGenre);
 
-    void saveMany(List<Genre> newGenres);
-
     boolean update(Genre genre);
 
     Genre findByID(Integer genreID);

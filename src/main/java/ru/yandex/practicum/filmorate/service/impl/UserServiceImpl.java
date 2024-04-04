@@ -10,7 +10,6 @@ import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.repository.UserRepository;
 import ru.yandex.practicum.filmorate.service.UserService;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -38,35 +37,6 @@ public class UserServiceImpl implements UserService {
         }
 
         return userRepository.save(newUser);
-    }
-
-    @Override
-    public void saveMany(List<User> newUsers) {
-
-        List<User> existingUsers = new ArrayList<>();
-        List<User> newUsersToSave = new ArrayList<>();
-
-        for (User newUser : newUsers) {
-            validateUser(newUser);
-
-            User existingUserByEmail = userRepository.findByEmail(newUser.getEmail());
-            User existingUserByLogin = userRepository.findByLogin(newUser.getLogin());
-
-            if (existingUserByEmail != null || existingUserByLogin != null) {
-                if (existingUserByEmail != null) {
-                    existingUsers.add(existingUserByEmail);
-                } else {
-                    existingUsers.add(existingUserByLogin);
-                }
-            } else {
-                newUsersToSave.add(newUser);
-            }
-        }
-
-        if (!newUsersToSave.isEmpty()) {
-            userRepository.saveMany(newUsersToSave);
-        }
-
     }
 
     @Override

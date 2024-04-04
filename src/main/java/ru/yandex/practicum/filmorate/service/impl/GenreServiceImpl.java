@@ -9,7 +9,6 @@ import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.repository.GenreRepository;
 import ru.yandex.practicum.filmorate.service.GenreService;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @AllArgsConstructor
@@ -29,26 +28,6 @@ public class GenreServiceImpl implements GenreService {
         }
 
         return genreRepository.save(genre);
-    }
-
-    @Override
-    public void saveMany(List<Genre> newGenres) {
-        List<Genre> existingGenres = new ArrayList<>();
-        List<Genre> newGenresToSave = new ArrayList<>();
-
-        for (Genre newGenre : newGenres) {
-            Integer existingGenreId = genreRepository.findIdByName(newGenre.getName());
-            if (existingGenreId != null) {
-                newGenre.setId(existingGenreId);
-                existingGenres.add(newGenre);
-            } else {
-                newGenresToSave.add(newGenre);
-            }
-        }
-
-        if (!newGenresToSave.isEmpty()) {
-            genreRepository.saveMany(newGenresToSave);
-        }
     }
 
     @Override

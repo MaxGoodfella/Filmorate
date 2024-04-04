@@ -1,18 +1,14 @@
 package ru.yandex.practicum.filmorate.repository.impl;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
+import ru.yandex.practicum.filmorate.mapper.RatingMapper;
 import ru.yandex.practicum.filmorate.model.Rating;
 import ru.yandex.practicum.filmorate.repository.RatingRepository;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.util.List;
-import java.util.Map;
 
 
 @RequiredArgsConstructor
@@ -21,6 +17,8 @@ public class RatingRepositoryImpl implements RatingRepository {
 
     private final JdbcTemplate jdbcTemplate;
 
+    private final RatingMapper ratingMapper;
+
 
     @Override
     public Rating save(Rating rating) {
@@ -28,26 +26,8 @@ public class RatingRepositoryImpl implements RatingRepository {
                 .withTableName("FILM_RATING")
                 .usingGeneratedKeyColumns("rating_id");
 
-        int id = simpleJdbcInsert.executeAndReturnKey(ratingToMap(rating)).intValue();
+        int id = simpleJdbcInsert.executeAndReturnKey(ratingMapper.toMap(rating)).intValue();
         return rating.setId(id);
-    }
-
-    @Override
-    public void saveMany(List<Rating> newRatings) {
-        jdbcTemplate.batchUpdate(
-                "INSERT INTO FILM_RATING(RATING_NAME) VALUES (?)",
-                new BatchPreparedStatementSetter() {
-                    @Override
-                    public void setValues(PreparedStatement ps, int i) throws SQLException {
-                        Rating rating = newRatings.get(i);
-                        ps.setString(1, rating.getName());
-                    }
-
-                    @Override
-                    public int getBatchSize() {
-                        return newRatings.size();
-                    }
-                });
     }
 
 
@@ -66,7 +46,7 @@ public class RatingRepositoryImpl implements RatingRepository {
     public Rating findByID(Integer ratingID) {
         List<Rating> ratings = jdbcTemplate.query(
                 "SELECT * FROM FILM_RATING WHERE RATING_ID = ? ORDER BY RATING_ID",
-                ratingRowMapper(),
+                ratingMapper,
                 ratingID);
 
         if (ratings.isEmpty()) {
@@ -85,7 +65,7 @@ public class RatingRepositoryImpl implements RatingRepository {
 
         List<Rating> ratings = jdbcTemplate.query(
                 sqlQuery,
-                ratingRowMapper(),
+                ratingMapper,
                 filmId);
 
         if (ratings.isEmpty()) {
@@ -99,7 +79,7 @@ public class RatingRepositoryImpl implements RatingRepository {
     public Rating findByName(String ratingName) {
         List<Rating> ratings = jdbcTemplate.query(
                 "SELECT * FROM FILM_RATING WHERE RATING_NAME = ?",
-                ratingRowMapper(),
+                ratingMapper,
                 ratingName
         );
 
@@ -126,7 +106,7 @@ public class RatingRepositoryImpl implements RatingRepository {
     public List<Rating> findAll() {
         return jdbcTemplate.query(
                 "SELECT * FROM FILM_RATING ORDER BY RATING_ID",
-                ratingRowMapper());
+                ratingMapper);
     }
 
 
@@ -142,19 +122,6 @@ public class RatingRepositoryImpl implements RatingRepository {
         String sqlQuery = "DELETE FROM FILM_RATING";
 
         return jdbcTemplate.update(sqlQuery) > 0;
-    }
-
-
-
-    private static RowMapper<Rating> ratingRowMapper() {
-        return (rs, rowNum) -> new Rating(
-                rs.getInt("rating_id"),
-                rs.getString("rating_name"));
-    }
-
-    private Map<String, Object> ratingToMap(Rating rating) {
-        return Map.of(
-                "rating_name", rating.getName());
     }
 
 }

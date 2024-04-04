@@ -3,16 +3,16 @@ package ru.yandex.practicum.filmorate.repository.impl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
+import ru.yandex.practicum.filmorate.mapper.GenreMapper;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.repository.GenreRepository;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 
 @RequiredArgsConstructor
@@ -21,6 +21,8 @@ public class GenreRepositoryImpl implements GenreRepository {
 
     private final JdbcTemplate jdbcTemplate;
 
+    private final GenreMapper genreMapper;
+
 
     @Override
     public Genre save(Genre genre) {
@@ -28,26 +30,8 @@ public class GenreRepositoryImpl implements GenreRepository {
                 .withTableName("GENRES")
                 .usingGeneratedKeyColumns("genre_id");
 
-        int id = simpleJdbcInsert.executeAndReturnKey(genreToMap(genre)).intValue();
+        int id = simpleJdbcInsert.executeAndReturnKey(genreMapper.toMap(genre)).intValue();
         return genre.setId(id);
-    }
-
-    @Override
-    public void saveMany(List<Genre> newGenres) {
-        jdbcTemplate.batchUpdate(
-                "INSERT INTO GENRES(GENRE_NAME) VALUES (?)",
-                new BatchPreparedStatementSetter() {
-                    @Override
-                    public void setValues(PreparedStatement ps, int i) throws SQLException {
-                        Genre genre = newGenres.get(i);
-                        ps.setString(1, genre.getName());
-                    }
-
-                    @Override
-                    public int getBatchSize() {
-                        return newGenres.size();
-                    }
-                });
     }
 
 
@@ -66,7 +50,7 @@ public class GenreRepositoryImpl implements GenreRepository {
     public Genre findByID(Integer genreID) {
         List<Genre> genres = jdbcTemplate.query(
                 "SELECT * FROM GENRES WHERE GENRE_ID = ? ORDER BY GENRE_ID",
-                genreRowMapper(),
+                genreMapper,
                 genreID);
 
         if (genres.isEmpty()) {
@@ -80,7 +64,7 @@ public class GenreRepositoryImpl implements GenreRepository {
     public Genre findByName(String genreName) {
         List<Genre> genres = jdbcTemplate.query(
                 "SELECT * FROM GENRES WHERE GENRE_NAME = ?",
-                genreRowMapper(),
+                genreMapper,
                 genreName
         );
 
@@ -107,7 +91,7 @@ public class GenreRepositoryImpl implements GenreRepository {
     public List<Genre> findAll() {
         return jdbcTemplate.query(
                 "SELECT * FROM GENRES ORDER BY GENRE_ID",
-                genreRowMapper());
+                genreMapper);
     }
 
 
@@ -153,26 +137,13 @@ public class GenreRepositoryImpl implements GenreRepository {
                 "LEFT JOIN GENRES AS G ON FG.GENRE_ID = G.GENRE_ID " +
                 "WHERE FILM_ID = ?";
 
-        List<Genre> genres = jdbcTemplate.query(sqlQuery, genreRowMapper(), filmId);
+        List<Genre> genres = jdbcTemplate.query(sqlQuery, genreMapper, filmId);
 
         if (genres.isEmpty()) {
-            return null;
+            return Collections.emptyList();
         } else {
             return genres;
         }
-    }
-
-
-
-    private static RowMapper<Genre> genreRowMapper() {
-        return (rs, rowNum) -> new Genre(
-                rs.getInt("genre_id"),
-                rs.getString("genre_name"));
-    }
-
-    private Map<String, Object> genreToMap(Genre genre) {
-        return Map.of(
-                "genre_name", genre.getName());
     }
 
 }

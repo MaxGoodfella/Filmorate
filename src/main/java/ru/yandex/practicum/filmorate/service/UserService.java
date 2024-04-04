@@ -8,8 +8,6 @@ public interface UserService {
 
     User save(User newUser);
 
-    void saveMany(List<User> newUsers);
-
     User update(User user);
 
     User findById(Integer id);

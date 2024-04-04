@@ -30,13 +30,6 @@ public class FilmController {
         return savedFilm;
     }
 
-    @PostMapping(value = "/multiple", produces = MediaType.APPLICATION_JSON_VALUE)
-    public void saveMany(@Valid @RequestBody List<Film> newFilms) {
-        log.info("Start saving films {}", newFilms);
-        filmService.saveMany(newFilms);
-        log.info("Finish saving films {}", newFilms);
-    }
-
     @PutMapping
     public Film update(@Valid @RequestBody Film film) {
         log.info("Start updating film {}", film);

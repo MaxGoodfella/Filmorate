@@ -1,7 +1,6 @@
 package ru.yandex.practicum.filmorate.tests;
 
 import lombok.RequiredArgsConstructor;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -10,6 +9,7 @@ import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
+import ru.yandex.practicum.filmorate.mapper.UserMapper;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.repository.impl.UserRepositoryImpl;
 
@@ -29,16 +29,17 @@ public class UserRepositoryImplTest {
 
     private UserRepositoryImpl userRepositoryImpl;
 
+    private static UserMapper userMapper;
+
 
     @BeforeEach
     public void setUp() {
-        userRepositoryImpl = new UserRepositoryImpl(jdbcTemplate);
-    }
+        userMapper = new UserMapper();
 
-    @AfterEach
-    public void tearDown() {
+        userRepositoryImpl = new UserRepositoryImpl(jdbcTemplate, userMapper);
         jdbcTemplate.execute("DELETE FROM USERS");
     }
+
 
 
     @Test
@@ -218,57 +219,6 @@ public class UserRepositoryImplTest {
         assertThrows(DuplicateKeyException.class, () -> userRepositoryImpl.save(newUser2));
     }
 
-    @Test
-    public void testSaveMany() {
-        User newUser1 = new User(1, "user1", "user1@gmail.com", "User1 Name",
-                LocalDate.of(1990, 1, 1));
-        User newUser2 = new User(2, "user2", "user2@gmail.com", "User2 Name",
-                LocalDate.of(1990, 1, 1));
-        List<User> newUsers = new ArrayList<>();
-        newUsers.add(newUser1);
-        newUsers.add(newUser2);
-
-        assertDoesNotThrow(() -> userRepositoryImpl.saveMany(newUsers));
-    }
-
-    @Test
-    public void testSaveManyWithEmptyNames() {
-        User newUser1 = new User(1, " ", "user1@gmail.com", "User1 Name",
-                LocalDate.of(1990, 1, 1));
-        User newUser2 = new User(2, "", "user2@gmail.com", "User2 Name",
-                LocalDate.of(1990, 1, 1));
-        List<User> newUsers = new ArrayList<>();
-        newUsers.add(newUser1);
-        newUsers.add(newUser2);
-
-        assertDoesNotThrow(() -> userRepositoryImpl.saveMany(newUsers));
-    }
-
-    @Test
-    public void testSaveManySameEmail_shouldThrowDuplicateKeyException() {
-        User newUser1 = new User(1, "user1", "user1@gmail.com", "User1 Name",
-                LocalDate.of(1990, 1, 1));
-        User newUser2 = new User(2, "user2", "user1@gmail.com", "User2 Name",
-                LocalDate.of(1990, 1, 1));
-        List<User> newUsers = new ArrayList<>();
-        newUsers.add(newUser1);
-        newUsers.add(newUser2);
-
-        assertThrows(DuplicateKeyException.class, () -> userRepositoryImpl.saveMany(newUsers));
-    }
-
-    @Test
-    public void testSaveManySameLogin_shouldThrowDuplicateKeyException() {
-        User newUser1 = new User(1, "user1", "user1@gmail.com", "User1 Name",
-                LocalDate.of(1990, 1, 1));
-        User newUser2 = new User(2, "user2", "user2@gmail.com", "User1 Name",
-                LocalDate.of(1990, 1, 1));
-        List<User> newUsers = new ArrayList<>();
-        newUsers.add(newUser1);
-        newUsers.add(newUser2);
-
-        assertThrows(DuplicateKeyException.class, () -> userRepositoryImpl.saveMany(newUsers));
-    }
 
     @Test
     public void testUpdate() {
@@ -360,12 +310,10 @@ public class UserRepositoryImplTest {
         userRepositoryImpl.addFriend(newUser1.getId(), newUser2.getId());
 
         assertTrue(userRepositoryImpl.findFriendsById(newUser1.getId()).contains(newUser2));
-        //assertTrue(userRepositoryImpl.findFriendsIdsById(newUser2.getId()).contains(newUser1.getId()));
 
         userRepositoryImpl.removeFriend(newUser1.getId(), newUser2.getId());
 
         assertFalse(userRepositoryImpl.findFriendsById(newUser1.getId()).contains(newUser2));
-        //assertFalse(userRepositoryImpl.findFriendsIdsById(newUser2.getId()).contains(newUser1.getId()));
     }
 
     @Test
@@ -388,14 +336,6 @@ public class UserRepositoryImplTest {
         assertEquals(2, user1friends.size());
         assertTrue(user1friends.contains(newUser2));
         assertTrue(user1friends.contains(newUser3));
-
-//        List<User> user2friendsIds = userRepositoryImpl.findFriendsById(newUser2.getId());
-//        assertEquals(1, user2friendsIds.size());
-//        assertTrue(user2friendsIds.contains(newUser1.getId()));
-//
-//        List<User> user3friendsIds = userRepositoryImpl.findFriendsById(newUser3.getId());
-//        assertEquals(1, user3friendsIds.size());
-//        assertTrue(user3friendsIds.contains(newUser1.getId()));
     }
 
     @Test

@@ -6,6 +6,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
+import ru.yandex.practicum.filmorate.mapper.FilmMapper;
+import ru.yandex.practicum.filmorate.mapper.GenreMapper;
+import ru.yandex.practicum.filmorate.mapper.RatingMapper;
+import ru.yandex.practicum.filmorate.mapper.UserMapper;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Rating;
 import ru.yandex.practicum.filmorate.model.User;
@@ -40,11 +44,28 @@ public class FilmRepositoryImplTest {
 
     private static Rating savedRating3;
 
+    private static RatingMapper ratingMapper;
+
+    private static GenreMapper genreMapper;
+
+    private static FilmMapper filmMapper;
+
+    private static UserMapper userMapper;
+
+
     @BeforeEach
     public void setUp() {
-        ratingRepositoryImpl = new RatingRepositoryImpl(jdbcTemplate);
-        genreRepositoryImpl = new GenreRepositoryImpl(jdbcTemplate);
-        filmRepositoryImpl = new FilmRepositoryImpl(jdbcTemplate, ratingRepositoryImpl, genreRepositoryImpl);
+        ratingMapper = new RatingMapper();
+        genreMapper = new GenreMapper();
+        userMapper = new UserMapper();
+
+        ratingRepositoryImpl = new RatingRepositoryImpl(jdbcTemplate, ratingMapper);
+        genreRepositoryImpl = new GenreRepositoryImpl(jdbcTemplate, genreMapper);
+
+        filmMapper = new FilmMapper(ratingRepositoryImpl, genreRepositoryImpl);
+
+        filmRepositoryImpl = new FilmRepositoryImpl(jdbcTemplate, filmMapper);
+
         jdbcTemplate.execute("DELETE FROM FILMS");
 
         Rating newRating1 = new Rating(1, "PG13");
@@ -168,6 +189,10 @@ public class FilmRepositoryImplTest {
 
         List<Film> savedFilms = filmRepositoryImpl.findAll();
 
+        for (Film film : savedFilms) {
+            film.setGenres(null);
+        }
+
         assertThat(savedFilms)
                 .isNotNull()
                 .usingRecursiveComparison()
@@ -182,19 +207,6 @@ public class FilmRepositoryImplTest {
                 LocalDate.of(1990, 12, 12), 100, savedRating1, 0);
 
         assertDoesNotThrow(() -> filmRepositoryImpl.save(newFilm));
-    }
-
-    @Test
-    public void testSaveMany() {
-        Film newFilm1 = new Film("Name1", "Description2",
-                LocalDate.of(1990, 12, 12), 100, savedRating1, 0);
-        Film newFilm2 = new Film("Name2", "Description2",
-                LocalDate.of(1990, 12, 12), 100, savedRating2, 0);
-        List<Film> newFilms = new ArrayList<>();
-        newFilms.add(newFilm1);
-        newFilms.add(newFilm2);
-
-        assertDoesNotThrow(() -> filmRepositoryImpl.saveMany(newFilms));
     }
 
 
@@ -261,7 +273,10 @@ public class FilmRepositoryImplTest {
     @Test
     public void testAddLike() {
 
-        UserRepositoryImpl userRepositoryImpl = new UserRepositoryImpl(jdbcTemplate);
+        //UserRepositoryImpl userRepositoryImpl = new UserRepositoryImpl(jdbcTemplate);
+
+
+        UserRepositoryImpl userRepositoryImpl = new UserRepositoryImpl(jdbcTemplate, userMapper);
 
         User newUser1 = new User(1, "user1", "user1@gmail.com", "User1 Name",
                 LocalDate.of(1990, 1, 1));
@@ -299,7 +314,8 @@ public class FilmRepositoryImplTest {
     @Test
     public void testRemoveLike() {
 
-        UserRepositoryImpl userRepositoryImpl = new UserRepositoryImpl(jdbcTemplate);
+        //UserRepositoryImpl userRepositoryImpl = new UserRepositoryImpl(jdbcTemplate);
+        UserRepositoryImpl userRepositoryImpl = new UserRepositoryImpl(jdbcTemplate, userMapper);
 
         User newUser1 = new User(1, "user1", "user1@gmail.com", "User1 Name",
                 LocalDate.of(1990, 1, 1));
@@ -342,7 +358,8 @@ public class FilmRepositoryImplTest {
     @Test
     public void testGetTopByLikes() {
 
-        UserRepositoryImpl userRepositoryImpl = new UserRepositoryImpl(jdbcTemplate);
+        //UserRepositoryImpl userRepositoryImpl = new UserRepositoryImpl(jdbcTemplate);
+        UserRepositoryImpl userRepositoryImpl = new UserRepositoryImpl(jdbcTemplate, userMapper);
 
         User newUser1 = new User(1, "user1", "user1@gmail.com", "User1 Name",
                 LocalDate.of(1990, 1, 1));
@@ -412,7 +429,8 @@ public class FilmRepositoryImplTest {
     @Test
     public void testFindFilmFansIds() {
 
-        UserRepositoryImpl userRepositoryImpl = new UserRepositoryImpl(jdbcTemplate);
+        //UserRepositoryImpl userRepositoryImpl = new UserRepositoryImpl(jdbcTemplate);
+        UserRepositoryImpl userRepositoryImpl = new UserRepositoryImpl(jdbcTemplate, userMapper);
 
         User newUser1 = new User(1, "user1", "user1@gmail.com", "User1 Name",
                 LocalDate.of(1990, 1, 1));

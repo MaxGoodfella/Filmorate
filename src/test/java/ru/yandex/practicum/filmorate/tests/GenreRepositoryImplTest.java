@@ -7,6 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.core.JdbcTemplate;
+import ru.yandex.practicum.filmorate.mapper.FilmMapper;
+import ru.yandex.practicum.filmorate.mapper.GenreMapper;
+import ru.yandex.practicum.filmorate.mapper.RatingMapper;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Rating;
@@ -28,11 +31,27 @@ public class GenreRepositoryImplTest {
 
     private final JdbcTemplate jdbcTemplate;
 
+    private static RatingRepositoryImpl ratingRepositoryImpl;
+
     private GenreRepositoryImpl genreRepositoryImpl;
+
+    private static GenreMapper genreMapper;
+
+    private static RatingMapper ratingMapper;
+
+    private static FilmMapper filmMapper;
 
     @BeforeEach
     public void setUp() {
-        genreRepositoryImpl = new GenreRepositoryImpl(jdbcTemplate);
+        genreMapper = new GenreMapper();
+        ratingMapper = new RatingMapper();
+
+        ratingRepositoryImpl = new RatingRepositoryImpl(jdbcTemplate, ratingMapper);
+        genreRepositoryImpl = new GenreRepositoryImpl(jdbcTemplate, genreMapper);
+
+        filmMapper = new FilmMapper(ratingRepositoryImpl, genreRepositoryImpl);
+
+
         jdbcTemplate.execute("DELETE FROM GENRES");
     }
 
@@ -139,29 +158,6 @@ public class GenreRepositoryImplTest {
     }
 
     @Test
-    public void testSaveMany() {
-        Genre newGenre1 = new Genre(1, "Comedy");
-        Genre newGenre2 = new Genre(2, "Drama");
-        List<Genre> newGenres = new ArrayList<>();
-        newGenres.add(newGenre1);
-        newGenres.add(newGenre2);
-
-        assertDoesNotThrow(() -> genreRepositoryImpl.saveMany(newGenres));
-    }
-
-    @Test
-    public void testSaveMany_shouldThrowDuplicateKeyException() {
-        Genre newGenre1 = new Genre(1, "Comedy");
-        Genre newGenre2 = new Genre(2, "Comedy");
-        List<Genre> newGenres = new ArrayList<>();
-        newGenres.add(newGenre1);
-        newGenres.add(newGenre2);
-
-        assertThrows(DuplicateKeyException.class, () -> genreRepositoryImpl.saveMany(newGenres));
-    }
-
-
-    @Test
     public void testDeleteByExistingId() {
         Genre newGenre = new Genre(1, "Comedy");
 
@@ -196,7 +192,7 @@ public class GenreRepositoryImplTest {
     @Test
     public void testAdd() {
 
-        RatingRepositoryImpl ratingRepositoryImpl = new RatingRepositoryImpl(jdbcTemplate);
+        RatingRepositoryImpl ratingRepositoryImpl = new RatingRepositoryImpl(jdbcTemplate, ratingMapper);
 
         Rating newRating1 = new Rating(1, "PG13");
         Rating newRating2 = new Rating(2, "PG17");
@@ -222,7 +218,7 @@ public class GenreRepositoryImplTest {
 
 
         FilmRepositoryImpl filmRepositoryImpl = new FilmRepositoryImpl(jdbcTemplate,
-                ratingRepositoryImpl, genreRepositoryImpl);
+                filmMapper);
 
         Film newFilm1 = new Film("Name1", "Description2",
                 LocalDate.of(1990, 12, 12), 100, savedRating1, 0);

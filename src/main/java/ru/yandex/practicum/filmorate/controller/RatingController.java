@@ -29,13 +29,6 @@ public class RatingController {
         return savedRating;
     }
 
-    @PostMapping(value = "/multiple", produces = MediaType.APPLICATION_JSON_VALUE)
-    public void saveMany(@Valid @RequestBody List<Rating> newRatings) {
-        log.info("Start saving ratings {}", newRatings);
-        ratingService.saveMany(newRatings);
-        log.info("Finish saving ratings {}", newRatings);
-    }
-
     @PutMapping
     public void update(@Valid @RequestBody Rating rating) {
         log.info("Start updating rating {}", rating);

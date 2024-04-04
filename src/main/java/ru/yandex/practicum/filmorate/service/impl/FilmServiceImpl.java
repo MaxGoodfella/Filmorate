@@ -15,7 +15,9 @@ import ru.yandex.practicum.filmorate.repository.RatingRepository;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Slf4j
 @Service
@@ -31,52 +33,58 @@ public class FilmServiceImpl implements FilmService {
 
     @Override
     public Film save(Film newFilm) {
+
+        Rating existingRating = ratingRepository.findByID(newFilm.getMpa().getId());
+        if (existingRating == null) {
+            throw new IllegalArgumentException("Rating with id " + newFilm.getMpa().getId() + " does not exist");
+        }
+
         Film existingFilm = filmRepository.findByNameDescriptionReleaseDateAndDuration(
                 newFilm.getName(), newFilm.getDescription(), newFilm.getReleaseDate(), newFilm.getDuration());
 
         if (existingFilm != null) {
-            Rating existingRating = ratingRepository.findByFilmId(existingFilm.getId());
-            if (existingRating != null && existingRating.getId() == newFilm.getMpa().getId()) {
+            Rating existingFilmRating = ratingRepository.findByFilmId(existingFilm.getId());
+            if (existingFilmRating != null && existingFilmRating.getId() == newFilm.getMpa().getId()) {
+
                 List<Genre> existingGenres = genreRepository.findGenresForFilm(existingFilm.getId());
-                if (existingGenres != null) {
-                    for (Genre existingGenre : existingGenres) {
-                        for (Genre newGenre : newFilm.getGenres()) {
-                            if (existingGenre.getId().equals(newGenre.getId())) {
-                                throw new EntityAlreadyExistsException(Film.class, "Фильм с такими параметрами уже существует");
-                            }
-                        }
-                    }
+
+                List<Genre> newGenres = newFilm.getGenres();
+                if (!existingGenres.isEmpty() && existingGenres.size() == newGenres.size() &&
+                        existingGenres.containsAll(newGenres)) {
+                    throw new EntityAlreadyExistsException(Film.class, "Фильм с такими параметрами уже существует");
                 }
             }
+
         }
 
-        return filmRepository.save(newFilm);
-    }
+        Film savedFilm = filmRepository.save(newFilm);
 
-    @Override
-    public void saveMany(List<Film> newFilms) {
+        List<Genre> genres = newFilm.getGenres();
+        if (genres != null && !genres.isEmpty()) {
+            Set<Integer> genreIds = new HashSet<>();
+            List<Genre> uniqueGenres = new ArrayList<>();
 
-        List<Film> existingFilms = new ArrayList<>();
-        List<Film> newFilmsToSave = new ArrayList<>();
-
-
-        for (Film newFilm : newFilms) {
-
-            Film existingFilm = filmRepository.findByNameDescriptionReleaseDateAndDuration(
-                    newFilm.getName(), newFilm.getDescription(), newFilm.getReleaseDate(), newFilm.getDuration());
-
-            if (existingFilm != null) {
-                existingFilms.add(existingFilm);
-            } else {
-                newFilmsToSave.add(newFilm);
+            for (Genre genre : genres) {
+                if (!genreIds.contains(genre.getId())) {
+                    genreIds.add(genre.getId());
+                    uniqueGenres.add(genre);
+                }
             }
 
+            List<Genre> filmGenres = new ArrayList<>();
+            for (Genre uniqueGenre : uniqueGenres) {
+                Genre existingGenre = genreRepository.findByID(uniqueGenre.getId());
+                if (existingGenre == null) {
+                    throw new IllegalArgumentException("Genre with id " + uniqueGenre.getId() + " does not exist");
+                }
+                filmGenres.add(existingGenre);
+            }
+
+            genreRepository.add(savedFilm.getId(), filmGenres);
+            savedFilm.setGenres(filmGenres);
         }
 
-        if (!newFilmsToSave.isEmpty()) {
-            filmRepository.saveMany(newFilmsToSave);
-        }
-
+        return savedFilm;
     }
 
     @Override
@@ -159,7 +167,6 @@ public class FilmServiceImpl implements FilmService {
         return filmRepository.removeLike(filmId, userId);
 
     }
-
 
     @Override
     public List<Film> getTopByLikes(Integer count) {
