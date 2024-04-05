@@ -58,11 +58,16 @@ public class FilmServiceImpl implements FilmService {
         }
 
         Film savedFilm = filmRepository.save(newFilm);
-        genreService.load(List.of(savedFilm));
+        //genreService.load(List.of(savedFilm));
 
 
         List<Genre> genres = newFilm.getGenres();
-        if (genres != null && !genres.isEmpty()) {
+
+        if (genres == null || genres.isEmpty()) {
+            newFilm.setGenres(new ArrayList<>());
+        } else {
+
+        // if (genres != null && !genres.isEmpty()) {
             Set<Integer> genreIds = new HashSet<>();
             List<Genre> uniqueGenres = new ArrayList<>();
 
