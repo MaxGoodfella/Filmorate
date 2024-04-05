@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.EntityAlreadyExistsException;
 import ru.yandex.practicum.filmorate.exceptions.EntityNotFoundException;
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.repository.GenreRepository;
@@ -71,6 +72,11 @@ public class GenreServiceImpl implements GenreService {
     @Override
     public boolean deleteAll() {
         return genreRepository.deleteAll();
+    }
+
+    @Override
+    public void load(List<Film> films) {
+        genreRepository.load(films);
     }
 
 }

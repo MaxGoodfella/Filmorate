@@ -13,7 +13,6 @@ import java.util.List;
 
 @RestController
 @Slf4j
-@Validated
 @AllArgsConstructor
 @RequestMapping("/genres")
 public class GenreController {

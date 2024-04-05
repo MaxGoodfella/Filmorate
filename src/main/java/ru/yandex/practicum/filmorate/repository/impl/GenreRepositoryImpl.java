@@ -5,14 +5,20 @@ import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
-import ru.yandex.practicum.filmorate.mapper.GenreMapper;
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.repository.GenreRepository;
+import ru.yandex.practicum.filmorate.mapper.GenreMapper;
 
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import static java.util.function.UnaryOperator.identity;
 
 
 @RequiredArgsConstructor
@@ -145,5 +151,32 @@ public class GenreRepositoryImpl implements GenreRepository {
             return genres;
         }
     }
+
+    @Override
+    public void load(List<Film> films) {
+        final Map<Integer, Film> filmById = films.stream().collect(Collectors.toMap(Film::getId, identity()));
+
+        String inSql = String.join(",", Collections.nCopies(films.size(), "?"));
+
+        final String sqlQuery = "select * from GENRES g, " +
+                "FILM_GENRE fg where fg.GENRE_ID = g.GENRE_ID AND fg.FILM_ID in (" + inSql + ")";
+
+        jdbcTemplate.query(sqlQuery, (rs) -> {
+            final Film film = filmById.get(rs.getInt("FILM_ID"));
+            film.addGenre(genreMapper.mapRow(rs, 0));
+        }, films.stream().map(Film::getId).toArray());
+    }
+
+
+//    public Genre mapRow(ResultSet rs, int rowNum) throws SQLException {
+//        return new Genre(
+//                rs.getInt("genre_id"),
+//                rs.getString("genre_name"));
+//    }
+//
+//    public Map<String, Object> toMap(Genre genre) {
+//        return Map.of(
+//                "genre_name", genre.getName());
+//    }
 
 }

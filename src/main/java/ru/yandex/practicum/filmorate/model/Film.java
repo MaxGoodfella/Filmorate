@@ -74,4 +74,8 @@ public class Film {
         this.popularity = popularity;
     }
 
+    public void addGenre(Genre genre) {
+        genres.add(genre);
+    }
+
 }

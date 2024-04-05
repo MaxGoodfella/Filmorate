@@ -18,8 +18,7 @@ create table IF NOT EXISTS FILMS
     RATING_ID    INTEGER,
     POPULARITY   INTEGER DEFAULT 0,
     constraint FILMS_PK
-        primary key (FILM_ID)
-        ,
+        primary key (FILM_ID),
     constraint FILMS_FILM_RATING_FK
         foreign key (RATING_ID) references FILM_RATING ON DELETE CASCADE
 );
@@ -42,7 +41,9 @@ create table IF NOT EXISTS FILM_FANS
     constraint FILM_FANS_FILMS_FK
         foreign key (FILM_ID) references FILMS ON DELETE CASCADE,
     constraint FILM_FANS_USERS_FK
-        foreign key (USER_ID) references USERS ON DELETE CASCADE
+        foreign key (USER_ID) references USERS ON DELETE CASCADE,
+    constraint FILM_FANS_PK
+        primary key (USER_ID, FILM_ID)
 );
 
 create table IF NOT EXISTS GENRES
@@ -60,7 +61,9 @@ create table IF NOT EXISTS FILM_GENRE
     constraint FILM_GENRE_FILMS_FK
         foreign key (FILM_ID) references FILMS ON DELETE CASCADE,
     constraint FILM_GENRE_GENRE_FK
-        foreign key (GENRE_ID) references GENRES ON DELETE CASCADE
+        foreign key (GENRE_ID) references GENRES ON DELETE CASCADE,
+    constraint FILM_GENRE_PK
+        primary key (FILM_ID, GENRE_ID)
 );
 
 create table IF NOT EXISTS USER_FRIENDSHIP
@@ -70,5 +73,7 @@ create table IF NOT EXISTS USER_FRIENDSHIP
     constraint USER_FRIENDSHIP_USERS_FK
         foreign key (USER_ID) references USERS ON DELETE CASCADE,
     constraint USER_FRIENDSHIP_USERS_FK_1
-        foreign key (FRIEND_ID) references USERS ON DELETE CASCADE
+        foreign key (FRIEND_ID) references USERS ON DELETE CASCADE,
+    constraint USER_FRIENDSHIP_PK
+        primary key (USER_ID, FRIEND_ID)
 );

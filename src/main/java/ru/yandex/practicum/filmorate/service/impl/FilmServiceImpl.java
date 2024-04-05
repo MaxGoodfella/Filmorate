@@ -13,16 +13,16 @@ import ru.yandex.practicum.filmorate.repository.FilmRepository;
 import ru.yandex.practicum.filmorate.repository.GenreRepository;
 import ru.yandex.practicum.filmorate.repository.RatingRepository;
 import ru.yandex.practicum.filmorate.service.FilmService;
+import ru.yandex.practicum.filmorate.service.GenreService;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Slf4j
 @Service
 @AllArgsConstructor
 public class FilmServiceImpl implements FilmService {
+
+    private GenreService genreService;
 
     private FilmRepository filmRepository;
 
@@ -102,7 +102,9 @@ public class FilmServiceImpl implements FilmService {
     @Override
     public Film findById(Integer id) {
         try {
-            return filmRepository.findById(id);
+            Film film = filmRepository.findById(id);
+            genreService.load(List.of(film));
+            return film;
         } catch (EmptyResultDataAccessException ex) {
             throw new EntityNotFoundException(Film.class, "Film with id = " + id + " hasn't been found");
         }
@@ -111,7 +113,9 @@ public class FilmServiceImpl implements FilmService {
     @Override
     public Film findByName(String filmName) {
         try {
-            return filmRepository.findByName(filmName);
+            Film film = filmRepository.findByName(filmName);
+            genreService.load(List.of(film));
+            return film;
         } catch (EmptyResultDataAccessException ex) {
             throw new EntityNotFoundException(Film.class, "Film with name '" + filmName + "' hasn't been found");
         }
@@ -119,7 +123,9 @@ public class FilmServiceImpl implements FilmService {
 
     @Override
     public List<Film> findAll() {
-        return filmRepository.findAll();
+        List<Film> all = filmRepository.findAll();
+        genreService.load(all);
+        return all;
     }
 
     @Override
@@ -170,7 +176,9 @@ public class FilmServiceImpl implements FilmService {
 
     @Override
     public List<Film> getTopByLikes(Integer count) {
-        return filmRepository.getTopByLikes(count);
+        List<Film> top = filmRepository.getTopByLikes(count);
+        genreService.load(top);
+        return top;
     }
 
 }

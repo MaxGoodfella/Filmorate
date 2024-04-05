@@ -13,7 +13,6 @@ import java.util.List;
 
 @RestController
 @Slf4j
-@Validated
 @AllArgsConstructor
 @RequestMapping("/mpa")
 public class RatingController {
