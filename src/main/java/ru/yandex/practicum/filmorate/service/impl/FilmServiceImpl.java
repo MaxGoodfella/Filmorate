@@ -58,6 +58,8 @@ public class FilmServiceImpl implements FilmService {
         }
 
         Film savedFilm = filmRepository.save(newFilm);
+        genreService.load(List.of(savedFilm));
+
 
         List<Genre> genres = newFilm.getGenres();
         if (genres != null && !genres.isEmpty()) {
