@@ -39,60 +39,41 @@ public class FilmServiceImpl implements FilmService {
             throw new IllegalArgumentException("Rating with id " + newFilm.getMpa().getId() + " does not exist");
         }
 
-        Film existingFilm = filmRepository.findByNameDescriptionReleaseDateAndDuration(
-                newFilm.getName(), newFilm.getDescription(), newFilm.getReleaseDate(), newFilm.getDuration());
-
-        if (existingFilm != null) {
-            Rating existingFilmRating = ratingRepository.findByFilmId(existingFilm.getId());
-            if (existingFilmRating != null && existingFilmRating.getId() == newFilm.getMpa().getId()) {
-
-                List<Genre> existingGenres = genreRepository.findGenresForFilm(existingFilm.getId());
-
-                List<Genre> newGenres = newFilm.getGenres();
-                if (!existingGenres.isEmpty() && existingGenres.size() == newGenres.size() &&
-                        existingGenres.containsAll(newGenres)) {
-                    throw new EntityAlreadyExistsException(Film.class, "Фильм с такими параметрами уже существует");
-                }
-            }
-
-        }
-
         Film savedFilm = filmRepository.save(newFilm);
-        //genreService.load(List.of(savedFilm));
-
 
         List<Genre> genres = newFilm.getGenres();
 
         if (genres == null || genres.isEmpty()) {
             newFilm.setGenres(new ArrayList<>());
         } else {
+            Map<Integer, Genre> allGenresMap = new HashMap<>();
+            List<Genre> allGenresList = genreRepository.findAll();
+            for (Genre genre : allGenresList) {
+                allGenresMap.put(genre.getId(), genre);
+            }
 
-        // if (genres != null && !genres.isEmpty()) {
+            List<Genre> savedGenres = new ArrayList<>();
             Set<Integer> genreIds = new HashSet<>();
-            List<Genre> uniqueGenres = new ArrayList<>();
 
             for (Genre genre : genres) {
-                if (!genreIds.contains(genre.getId())) {
-                    genreIds.add(genre.getId());
-                    uniqueGenres.add(genre);
-                }
-            }
-
-            List<Genre> filmGenres = new ArrayList<>();
-            for (Genre uniqueGenre : uniqueGenres) {
-                Genre existingGenre = genreRepository.findByID(uniqueGenre.getId());
+                Genre existingGenre = allGenresMap.get(genre.getId());
                 if (existingGenre == null) {
-                    throw new IllegalArgumentException("Genre with id " + uniqueGenre.getId() + " does not exist");
+                    throw new IllegalArgumentException("Genre with id " + genre.getId() + " does not exist");
                 }
-                filmGenres.add(existingGenre);
+
+                if (!genreIds.contains(genre.getId())) {
+                    savedGenres.add(existingGenre);
+                    genreIds.add(genre.getId());
+                }
             }
 
-            genreRepository.add(savedFilm.getId(), filmGenres);
-            savedFilm.setGenres(filmGenres);
+            genreRepository.add(savedFilm.getId(), savedGenres);
+            savedFilm.setGenres(savedGenres);
         }
 
         return savedFilm;
     }
+
 
     @Override
     public Film update(Film film) {

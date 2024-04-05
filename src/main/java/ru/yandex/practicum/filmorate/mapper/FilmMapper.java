@@ -4,10 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Rating;
-import ru.yandex.practicum.filmorate.repository.GenreRepository;
-import ru.yandex.practicum.filmorate.repository.RatingRepository;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -19,11 +16,6 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class FilmMapper implements RowMapper<Film> {
 
-    //private final RatingRepository ratingRepository;
-
-    // private final GenreRepository genreRepository;
-
-
     @Override
     public Film mapRow(ResultSet rs, int rowNum) throws SQLException {
         int filmId = rs.getInt("film_id");
@@ -34,8 +26,7 @@ public class FilmMapper implements RowMapper<Film> {
         int popularity = rs.getInt("popularity");
         Rating rating = new Rating(rs.getInt("rating_id"), rs.getString("rating_name"));
 
-        Film film = new Film(filmId, name, description, releaseDate, duration, rating, popularity);
-        return film;
+        return new Film(filmId, name, description, releaseDate, duration, rating, popularity);
     }
 
     public Map<String, Object> toMap(Film film) {

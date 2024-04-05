@@ -49,7 +49,7 @@ public class GenreRepositoryImplTest {
         ratingRepositoryImpl = new RatingRepositoryImpl(jdbcTemplate, ratingMapper);
         genreRepositoryImpl = new GenreRepositoryImpl(jdbcTemplate, genreMapper);
 
-        filmMapper = new FilmMapper(ratingRepositoryImpl, genreRepositoryImpl);
+        filmMapper = new FilmMapper();
 
 
         jdbcTemplate.execute("DELETE FROM GENRES");

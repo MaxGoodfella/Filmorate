@@ -58,14 +58,6 @@ public class FilmRepositoryImpl implements FilmRepository {
     }
 
 
-//    @Override
-//    public Film findById(Integer id) {
-//        return jdbcTemplate.queryForObject(
-//                "SELECT * FROM FILMS WHERE FILM_ID = ?",
-//                filmMapper,
-//                id);
-//    }
-
     @Override
     public Film findById(Integer id) {
         String sqlQuery = "SELECT f.*, fr.RATING_NAME " +
@@ -75,21 +67,13 @@ public class FilmRepositoryImpl implements FilmRepository {
         return jdbcTemplate.queryForObject(sqlQuery, filmMapper, id);
     }
 
-//    @Override
-//    public Film findById(Integer id) {
-//        String sqlQuery = "SELECT f.*, fr.RATING_NAME, fg.GENRE_ID, g.GENRE_NAME " +
-//                "FROM FILMS f " +
-//                "JOIN FILM_RATING fr ON f.RATING_ID = fr.RATING_ID " +
-//                "JOIN FILM_GENRE fg ON f.FILM_ID = fg.FILM_ID " +
-//                "JOIN GENRES g ON g.GENRE_ID = fg.GENRE_ID " +
-//                "WHERE f.FILM_ID = ?";
-//        return jdbcTemplate.queryForObject(sqlQuery, filmMapper, id);
-//    }
-
     @Override
     public Film findByName(String filmName) {
         return jdbcTemplate.queryForObject(
-                "SELECT * FROM FILMS WHERE NAME = ?",
+                "SELECT f.*, fr.RATING_NAME " +
+                        "FROM FILMS f " +
+                        "JOIN FILM_RATING fr ON f.RATING_ID = fr.RATING_ID " +
+                        "WHERE f.NAME = ?",
                 filmMapper,
                 filmName);
     }
@@ -108,7 +92,10 @@ public class FilmRepositoryImpl implements FilmRepository {
     @Override
     public Film findByNameDescriptionReleaseDateAndDuration(String name, String description, LocalDate releaseDate, int duration) {
         List<Film> films = jdbcTemplate.query(
-                "SELECT * FROM FILMS WHERE NAME = ? AND DESCRIPTION = ? AND RELEASE_DATE = ? AND DURATION = ?",
+                "SELECT f.*, fr.RATING_NAME " +
+                        "FROM FILMS f " +
+                        "JOIN FILM_RATING fr ON f.RATING_ID = fr.RATING_ID " +
+                        "WHERE f.NAME = ? AND f.DESCRIPTION = ? AND f.RELEASE_DATE = ? AND f.DURATION = ?",
                 filmMapper,
                 name, description, releaseDate, duration);
 
@@ -119,13 +106,6 @@ public class FilmRepositoryImpl implements FilmRepository {
         }
     }
 
-//    @Override
-//    public List<Film> findAll() {
-//        return jdbcTemplate.query(
-//                "SELECT * FROM FILMS",
-//                filmMapper);
-//    }
-
     @Override
     public List<Film> findAll() {
         String sqlQuery = "SELECT f.*, fr.RATING_NAME " +
@@ -133,18 +113,6 @@ public class FilmRepositoryImpl implements FilmRepository {
                 "JOIN FILM_RATING fr ON f.RATING_ID = fr.RATING_ID";
         return jdbcTemplate.query(sqlQuery, filmMapper);
     }
-
-//    @Override
-//    public List<Film> findAll() {
-//        String sqlQuery = "SELECT f.*, fr.RATING_NAME, fg.GENRE_ID, g.GENRE_NAME " +
-//                "FROM FILMS f " +
-//                "JOIN FILM_RATING fr ON f.RATING_ID = fr.RATING_ID " +
-//                "JOIN FILM_GENRE fg ON f.FILM_ID = fg.FILM_ID " +
-//                "JOIN GENRES g ON g.GENRE_ID = fg.GENRE_ID";
-//        return jdbcTemplate.query(sqlQuery, filmMapper);
-//    }
-
-
 
 
     @Override
@@ -196,7 +164,10 @@ public class FilmRepositoryImpl implements FilmRepository {
 
     @Override
     public List<Film> getTopByLikes(Integer count) {
-        String sqlQuery = "SELECT * FROM FILMS ORDER BY POPULARITY DESC LIMIT ?";
+        String sqlQuery = "SELECT f.*, fr.RATING_NAME " +
+                "FROM FILMS f JOIN FILM_RATING fr ON f.RATING_ID = fr.RATING_ID " +
+                "ORDER BY POPULARITY DESC " +
+                "LIMIT ?";
 
         return jdbcTemplate.query(sqlQuery, filmMapper, count);
     }
@@ -214,4 +185,5 @@ public class FilmRepositoryImpl implements FilmRepository {
         int count = jdbcTemplate.queryForObject(sqlQuery, Integer.class, filmId, userId);
         return count > 0;
     }
+
 }

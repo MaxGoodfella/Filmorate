@@ -62,7 +62,7 @@ public class FilmRepositoryImplTest {
         ratingRepositoryImpl = new RatingRepositoryImpl(jdbcTemplate, ratingMapper);
         genreRepositoryImpl = new GenreRepositoryImpl(jdbcTemplate, genreMapper);
 
-        filmMapper = new FilmMapper(ratingRepositoryImpl, genreRepositoryImpl);
+        filmMapper = new FilmMapper();
 
         filmRepositoryImpl = new FilmRepositoryImpl(jdbcTemplate, filmMapper);
 
@@ -188,10 +188,6 @@ public class FilmRepositoryImplTest {
         filmRepositoryImpl.save(newFilm2);
 
         List<Film> savedFilms = filmRepositoryImpl.findAll();
-
-        for (Film film : savedFilms) {
-            film.setGenres(null);
-        }
 
         assertThat(savedFilms)
                 .isNotNull()
