@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.exceptions;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -14,50 +15,32 @@ import javax.validation.ConstraintViolationException;
 @RestControllerAdvice
 public class CustomExceptionHandler {
 
-    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ExceptionHandler({MethodArgumentNotValidException.class, ConstraintViolationException.class, IllegalArgumentException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleValidationException(MethodArgumentNotValidException e) {
-        StringBuilder errorMessage = new StringBuilder();
-        e.getBindingResult().getFieldErrors().forEach(error ->
-                errorMessage.append(error.getField()).append(": ").append(error.getDefaultMessage()).append("; "));
+    public ErrorResponse handleBadRequestException(Exception e) {
         log.debug("Получен статус 400 Bad Request {}", e.getMessage(), e);
-        return new ErrorResponse(errorMessage.toString());
+        return new ErrorResponse(e.getMessage());
     }
 
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleTopLikedListLength(ConstraintViolationException e) {
-        log.debug("Получен статус 400 Bad Request {}", e.getMessage(), e);
-        return new ErrorResponse(
-                e.getMessage()
-        );
-    }
-
-    @ExceptionHandler
+    @ExceptionHandler({EntityNotFoundException.class, EmptyResultDataAccessException.class})
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorResponse handleEntityNotFoundException(final EntityNotFoundException e) {
+    public ErrorResponse handleEntityNotFoundException(RuntimeException e) {
         log.debug("Получен статус 404 Not Found {}", e.getMessage(), e);
-        return new ErrorResponse(
-                e.getMessage()
-        );
+        return new ErrorResponse(e.getMessage());
     }
 
-    @ExceptionHandler
+    @ExceptionHandler({EntityAlreadyExistsException.class})
     @ResponseStatus(HttpStatus.CONFLICT)
-    public ErrorResponse handleEntityAlreadyExistsException(final EntityAlreadyExistsException e) {
+    public ErrorResponse handleEntityAlreadyExistsException(EntityAlreadyExistsException e) {
         log.debug("Получен статус 409 Conflict {}", e.getMessage(), e);
-        return new ErrorResponse(
-                e.getMessage()
-        );
+        return new ErrorResponse(e.getMessage());
     }
 
-    @ExceptionHandler
+    @ExceptionHandler(Throwable.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ErrorResponse handleThrowable(final Throwable e) {
+    public ErrorResponse handleThrowable(Throwable e) {
         log.debug("Получен статус 500 Internal Server Error {}", e.getMessage(), e);
-        return new ErrorResponse(
-                "Произошла непредвиденная ошибка."
-        );
+        return new ErrorResponse("Произошла непредвиденная ошибка.");
     }
 
 }

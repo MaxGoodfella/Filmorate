@@ -10,6 +10,8 @@
 hs_err_pid*
 out/
 target/
+.db
+
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
@@ -42,5 +44,6 @@ build/
 ### VS Code ###
 .vscode/
 
-*.db
+
 db/*.DS_Store
+*.DS_Store
