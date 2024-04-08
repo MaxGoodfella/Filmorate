@@ -74,7 +74,6 @@ public class FilmServiceImpl implements FilmService {
         return savedFilm;
     }
 
-
     @Override
     public Film update(Film film) {
         boolean isSuccess = filmRepository.update(film);
@@ -84,8 +83,27 @@ public class FilmServiceImpl implements FilmService {
                     "Film with id = " + film.getId() + " hasn't been found");
         }
 
+        genreRepository.removeGenresForFilm(film.getId());
+
+        Set<Integer> uniqueGenreIds = new HashSet<>();
+
+        for (Genre genre : film.getGenres()) {
+            uniqueGenreIds.add(genre.getId());
+        }
+
+        List<Genre> uniqueGenres = new ArrayList<>();
+        for (Integer genreId : uniqueGenreIds) {
+            Genre genre = new Genre();
+            genre.setId(genreId);
+            uniqueGenres.add(genre);
+        }
+
+        genreRepository.add(film.getId(), uniqueGenres);
+        film.setGenres(uniqueGenres);
+
         return film;
     }
+
 
     @Override
     public Film findById(Integer id) {

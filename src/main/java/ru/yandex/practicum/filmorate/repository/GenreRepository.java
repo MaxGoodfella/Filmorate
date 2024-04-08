@@ -27,6 +27,8 @@ public interface GenreRepository {
 
     List<Genre> findGenresForFilm(Integer filmId);
 
+    void removeGenresForFilm(Integer filmId);
+
     void load(List<Film> films);
 
 }

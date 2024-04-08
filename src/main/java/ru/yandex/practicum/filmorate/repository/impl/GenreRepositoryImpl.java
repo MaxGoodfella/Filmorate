@@ -152,6 +152,12 @@ public class GenreRepositoryImpl implements GenreRepository {
     }
 
     @Override
+    public void removeGenresForFilm(Integer filmId) {
+        String sqlQuery = "DELETE FROM FILM_GENRE WHERE FILM_ID = ?";
+        jdbcTemplate.update(sqlQuery, filmId);
+    }
+
+    @Override
     public void load(List<Film> films) {
         final Map<Integer, Film> filmById = films.stream().collect(Collectors.toMap(Film::getId, identity()));
 
